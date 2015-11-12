@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""
+Script to execute an sql script against an oracle database using the sqlplus
+client.
+
+It can be used standalone or from within a sublime text build configuration.
+"""
 import os
 import sys
 import argparse
