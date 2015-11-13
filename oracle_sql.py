@@ -77,7 +77,7 @@ except:
 
 connection = args.user + '/' + args.password + '@' + args.sid
 
-file = (open(file_path, 'r'))
+file = open(file_path, 'r')
 script = file.read()
 script += '\nshow error'
 
