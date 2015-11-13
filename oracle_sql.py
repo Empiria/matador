@@ -4,6 +4,26 @@ Script to execute an sql script against an oracle database using the sqlplus
 client.
 
 It can be used standalone or from within a sublime text build configuration.
+
+Place this script in a directory included in the PATH environment variable. On
+Windows, add .PY to the PATHEXT variable.
+
+For Sublime Text, create a .sublime-build file in the 'Packages/User' directory
+with the following content:
+
+    {
+      "cmd":[
+          "oracle_sql",
+          "-d", "$file_path",
+          "-f", "$file_name",
+          "-u", "<User ID>"",
+          "-p", "<Password>",
+          "-s", "<SID>"],
+      "selector": "source.plsql.oracle",
+      "shell": "true"
+    }
+
+The "selector" entry assumes that package 'Oracle PL SQL' is installed.
 """
 import os
 import sys
@@ -55,11 +75,12 @@ except:
     parser.print_help()
     sys.exit(0)
 
-file = open(file_path, 'r')
 connection = args.user + '/' + args.password + '@' + args.sid
+file = open(file_path, 'r')
 
 os.chdir(args.directory)
 
 subprocess.run(
     ['sqlplus', '-S', '-L', connection], stdin=file)
+
 print('Executed %s against %s' % (args.file_name, args.sid))
