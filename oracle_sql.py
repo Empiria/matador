@@ -76,11 +76,13 @@ except:
     sys.exit(0)
 
 connection = args.user + '/' + args.password + '@' + args.sid
-file = open(file_path, 'r')
+file = (open(file_path, 'r').read() + '\nshow error').encode('utf-8')
 
 os.chdir(args.directory)
 
-subprocess.run(
-    ['sqlplus', '-S', '-L', connection], stdin=file)
+process = subprocess.Popen(
+    ['sqlplus', '-S', '-L', connection], stdin=subprocess.PIPE)
+process.stdin.write(file)
+process.stdin.close()
 
 print('\nExecuted %s against %s' % (args.file_name, args.sid))
