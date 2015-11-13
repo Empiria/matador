@@ -83,4 +83,4 @@ os.chdir(args.directory)
 subprocess.run(
     ['sqlplus', '-S', '-L', connection], stdin=file)
 
-print('Executed %s against %s' % (args.file_name, args.sid))
+print('\nExecuted %s against %s' % (args.file_name, args.sid))
