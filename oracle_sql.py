@@ -87,5 +87,6 @@ process = subprocess.Popen(
     ['sqlplus', '-S', '-L', connection], stdin=subprocess.PIPE)
 process.stdin.write(script.encode('utf-8'))
 process.stdin.close()
+process.wait()
 
 print('\nExecuted %s against %s' % (args.file_name, args.sid))
