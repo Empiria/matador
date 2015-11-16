@@ -5,22 +5,20 @@ client.
 
 It can be used standalone or from within a sublime text build configuration.
 
-Place this script in a directory included in the PATH environment variable. On
-Windows, add .PY to the PATHEXT variable.
+Place this script in a directory included in the PATH environment variable.
 
 For Sublime Text, create a .sublime-build file in the 'Packages/User' directory
 with the following content:
 
     {
       "cmd":[
-          "oracle_sql",
+          "oracle_sql.py",
           "-d", "$file_path",
           "-f", "$file_name",
           "-u", "<User ID>"",
           "-p", "<Password>",
           "-s", "<SID>"],
-      "selector": "source.plsql.oracle",
-      "shell": "true"
+      "selector": "source.plsql.oracle"
     }
 
 The "selector" entry assumes that package 'Oracle PL SQL' is installed.
@@ -84,7 +82,9 @@ script += '\nshow error'
 os.chdir(args.directory)
 
 process = subprocess.Popen(
-    ['sqlplus', '-S', '-L', connection], stdin=subprocess.PIPE)
+    ['sqlplus', '-S', '-L', connection],
+    stdin=subprocess.PIPE,
+    stderr=subprocess.PIPE)
 process.stdin.write(script.encode('utf-8'))
 process.stdin.close()
 process.wait()
