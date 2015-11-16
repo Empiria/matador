@@ -27,6 +27,7 @@ import os
 import sys
 import argparse
 import subprocess
+from string import Template
 
 parser = argparse.ArgumentParser(
     description="Pass an sql script to Oracle")
@@ -81,6 +82,14 @@ script += '\nshow error'
 
 os.chdir(args.directory)
 
+message = Template('Executing ${file_name} against ${sid} \n')
+substitutions = {
+    'file_name': args.file_name,
+    'sid': args.sid
+    }
+print(message.substitute(substitutions))
+sys.stdout.flush()
+
 process = subprocess.Popen(
     ['sqlplus', '-S', '-L', connection],
     stdin=subprocess.PIPE,
@@ -88,5 +97,3 @@ process = subprocess.Popen(
 process.stdin.write(script.encode('utf-8'))
 process.stdin.close()
 process.wait()
-
-print('\nExecuted %s against %s' % (args.file_name, args.sid))
