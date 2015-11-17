@@ -15,9 +15,9 @@ def execute_command():
 
     try:
         args = parser.parse_args()
+        command = commands[args.command](args)
     except:
         parser.print_help()
         sys.exit()
 
-    command = commands[args.command]()
     command.execute()

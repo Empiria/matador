@@ -1,8 +1,9 @@
 #!/usr/bin/env python
+from .command import Command
 import platform
 
 
-class Hello(object):
+class Hello(Command):
 
     def execute(self):
         print("Hello World")
