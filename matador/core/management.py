@@ -14,8 +14,8 @@ def execute_command():
         help='Command')
 
     try:
-        args = parser.parse_args()
-        command = commands[args.command](args)
+        args, sub_args = parser.parse_known_args()
+        command = commands[args.command](parser)
     except:
         parser.print_help()
         sys.exit()
