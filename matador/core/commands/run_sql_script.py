@@ -72,7 +72,8 @@ class RunSqlScript(Command):
     def execute(self):
         file_path = os.path.join(self.args.directory, self.args.file)
 
-        message = Template('Matador: Executing ${file} against ${connection} \n')
+        message = Template(
+            'Matador: Executing ${file} against ${connection} \n')
         substitutions = {
             'file': os.path.basename(file_path),
             'connection': self.args.connection
