@@ -29,7 +29,7 @@ def _setup_logging(logging_destination='console', verbosity='INFO'):
 
 def execute_command():
     parser = argparse.ArgumentParser(
-        description="Change management for Agresso")
+        description="Change management for Agresso systems")
 
     parser.add_argument(
         'command',
