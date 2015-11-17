@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Script to execute an sql script against an oracle database using the sqlplus
 client.
