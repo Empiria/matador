@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='Matador',
@@ -11,7 +11,7 @@ setup(
         ],
     },
     url='http://www.empiria.co.uk',
-    packages=['core'],
+    packages=find_packages(),
     license='The MIT License (MIT)',
     description='Change management for Agresso systems',
     classifiers=[
