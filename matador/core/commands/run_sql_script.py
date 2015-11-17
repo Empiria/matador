@@ -61,13 +61,14 @@ class RunSqlScript(Command):
 
         os.chdir(os.path.dirname(file_path))
 
-        process = subprocess.Popen(
-            ['sqlplus', '-S', '-L', connection],
-            stdin=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-        process.stdin.write(script.encode('utf-8'))
-        process.stdin.close()
-        process.wait()
+        if dbms.lower() == 'oracle':
+            process = subprocess.Popen(
+                ['sqlplus', '-S', '-L', connection],
+                stdin=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+            process.stdin.write(script.encode('utf-8'))
+            process.stdin.close()
+            process.wait()
 
     def execute(self):
         file_path = os.path.join(self.args.directory, self.args.file)
