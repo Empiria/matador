@@ -14,7 +14,6 @@ class Hello(Command):
             help='Message')
 
     def execute(self):
-        print("Hello")
-        print(self.args.message)
-        print(platform.python_version())
-        print
+        self._logger.info('Hello')
+        self._logger.info(self.args.message)
+        self._logger.info(platform.python_version())
