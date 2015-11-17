@@ -5,7 +5,7 @@ import argparse
 from matador.core.commands import commands
 
 
-def setup_logging(logging_destination='console', verbosity='DEBUG'):
+def _setup_logging(logging_destination='console', verbosity='INFO'):
     logHandlers = {
         'console': logging.StreamHandler(),
         'none': logging.NullHandler(),
@@ -28,7 +28,6 @@ def setup_logging(logging_destination='console', verbosity='DEBUG'):
 
 
 def execute_command():
-    setup_logging()
     parser = argparse.ArgumentParser(
         description="Change management for Agresso")
 
@@ -37,8 +36,22 @@ def execute_command():
         type=str,
         help='Command')
 
+    parser.add_argument(
+        '-l', '--logging',
+        type=str,
+        default='console',
+        dest='logging_destination',
+        help='logging (none, console or file)')
+
+    parser.add_argument(
+        '-v', '--verbosity',
+        type=str,
+        default='INFO',
+        help='Logging level. DEBUG, INFO, ERROR or CRITICAL')
+
     try:
         args, sub_args = parser.parse_known_args()
+        _setup_logging(args.logging_destination, args.verbosity)
         command = commands[args.command](parser)
     except:
         parser.print_help()
