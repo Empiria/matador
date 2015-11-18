@@ -60,8 +60,9 @@ def environments():
 def update_repository(project, branch='master'):
     repo_folder = matador_repository_folder(project)
     if not is_git_repository(repo_folder):
-        subprocess.run(
-            ['git', 'clone', '-n', '-b', branch, project_folder(), repo_folder],
+        subprocess.run([
+            'git', 'clone', '-n', '-b',
+            branch, project_folder(), repo_folder],
             stderr=subprocess.STDOUT,
             stdout=open(os.devnull, 'w'))
 
