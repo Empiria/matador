@@ -28,8 +28,9 @@ def _setup_logging(logging_destination='console', verbosity='INFO'):
     logger.addHandler(logHandler)
 
 
-def working_folder():
-    working_path = os.path.expanduser('~/.matador')
+def working_folder(project, environment):
+    working_path = os.path.expanduser(
+        '~/.matador/%s/%s' % (project, environment))
     os.makedirs(working_path, exist_ok=True)
     return working_path
 
