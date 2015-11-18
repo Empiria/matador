@@ -66,6 +66,11 @@ def update_repository(project, branch='master'):
             stderr=subprocess.STDOUT,
             stdout=open(os.devnull, 'w'))
 
+        subprocess.run([
+            'git', '-C', repo_folder, 'config', 'core.sparsecheckout', 'true'],
+            stderr=subprocess.STDOUT,
+            stdout=open(os.devnull, 'w'))
+
         git_path = (os.path.join(repo_folder, '.git'))
         config_file = os.path.join(git_path, 'config')
         with open(config_file, 'a') as f:
@@ -77,6 +82,13 @@ def update_repository(project, branch='master'):
         attributes_file = os.path.join(git_path, 'info', 'attributes')
         with open(attributes_file, 'a') as f:
             f.write('src/ filter=substitution\n')
+            f.close()
+
+        sparse_checkout_file = os.path.join(
+            git_path, 'info', 'sparse-checkout')
+        with open(sparse_checkout_file, 'a') as f:
+            f.write('src')
+            f.write('deploy')
             f.close()
 
     subprocess.run(

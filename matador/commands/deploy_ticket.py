@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from .command import Command
 from matador import utils
+import subprocess
 
 
 class DeployTicket(Command):
@@ -19,7 +20,16 @@ class DeployTicket(Command):
             default=False,
             help='Agresso environment name')
 
+    def _checkout_ticket(project, ticket, branch='master'):
+        repo_folder = utils.matador_repository_folder(project)
+        subprocess.run([
+            'git', '-C', repo_folder, 'checkout', branch],
+            stderr=subprocess.STDOUT,
+            stdout=open(os.devnull, 'w'))
+
+
     def _execute(self):
         project = utils.project()
         if not self.args.package:
             utils.update_repository(project)
+        self._checkout_ticket(project)
