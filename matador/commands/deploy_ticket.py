@@ -23,4 +23,7 @@ class DeployTicket(Command):
         project = utils.project()
         self._logger.info(project)
 
+        environments = utils.environments()
+        self._logger.info(environments)
+
         self._logger.info(utils.is_git_repository())

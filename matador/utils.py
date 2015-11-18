@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import subprocess
+import yaml
 
 
 def working_folder(project, environment):
@@ -26,3 +27,8 @@ def project_folder(path='.'):
 
 def project():
     return os.path.basename(project_folder())
+
+
+def environments():
+    return yaml.load(os.path.join(
+        project_folder(), 'config', 'environments.yml'))
