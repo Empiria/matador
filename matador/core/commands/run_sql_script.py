@@ -19,7 +19,7 @@ def _sql_script(file_path):
 
 class RunSqlScript(Command):
 
-    def add_arguments(self, parser):
+    def _add_arguments(self, parser):
         parser.add_argument(
             '-s', '--dbms',
             type=str,
@@ -70,7 +70,7 @@ class RunSqlScript(Command):
             process.stdin.close()
             process.wait()
 
-    def execute(self):
+    def _execute(self):
         file_path = os.path.join(self.args.directory, self.args.file)
 
         message = Template(

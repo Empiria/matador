@@ -29,7 +29,7 @@ def _setup_logging(logging_destination='console', verbosity='INFO'):
 
 def execute_command():
     parser = argparse.ArgumentParser(
-        description="Change management for Agresso systems")
+        description="Taming the bull: Change management for Agresso systems")
 
     parser.add_argument(
         'command',
@@ -52,9 +52,8 @@ def execute_command():
     try:
         args, sub_args = parser.parse_known_args()
         _setup_logging(args.logging_destination, args.verbosity)
-        command = commands[args.command](parser)
     except:
         parser.print_help()
         sys.exit()
 
-    command.execute()
+    commands[args.command]()
