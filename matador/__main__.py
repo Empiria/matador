@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from matador.core import management
+from matador import management
 
 if __name__ == "__main__":
 

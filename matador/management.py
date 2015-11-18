@@ -3,7 +3,7 @@ import sys
 import os
 import logging
 import argparse
-from matador.core.commands import commands
+from matador.commands import commands
 
 
 def _setup_logging(logging_destination='console', verbosity='INFO'):

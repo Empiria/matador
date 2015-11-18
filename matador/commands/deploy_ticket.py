@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from .command import Command
-from matador.core import management
+from matador import management
 
 
 class DeployTicket(Command):
