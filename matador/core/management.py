@@ -9,7 +9,7 @@ def _setup_logging(logging_destination='console', verbosity='INFO'):
     logHandlers = {
         'console': logging.StreamHandler(),
         'none': logging.NullHandler(),
-        'file': logging.FileHandler('./matador.log')
+        # 'file': logging.FileHandler('./matador.log')
     }
     logHandler = logHandlers[logging_destination]
 
