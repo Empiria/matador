@@ -6,6 +6,7 @@ from matador import utils
 class DeployTicket(Command):
 
     def _add_arguments(self, parser):
+        parser.prog = 'matador deploy-ticket'
         parser.add_argument(
             '-e', '--environment',
             type=str,
