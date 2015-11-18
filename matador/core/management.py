@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import os
 import logging
 import argparse
 from matador.core.commands import commands
@@ -25,6 +26,12 @@ def _setup_logging(logging_destination='console', verbosity='INFO'):
     level = logging.getLevelName(verbosity.upper())
     logger.setLevel(level)
     logger.addHandler(logHandler)
+
+
+def working_folder():
+    working_path = os.path.expanduser('~/.matador')
+    os.makedirs(working_path, exist_ok=True)
+    return working_path
 
 
 def execute_command():
