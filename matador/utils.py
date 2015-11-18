@@ -21,4 +21,8 @@ def project_folder(path='.'):
     git_output = subprocess.check_output(
         ['git', '-C', path, 'rev-parse', '--show-toplevel'],
         stderr=subprocess.STDOUT)
-    return git_output.decode('utf-8')
+    return git_output.decode('utf-8').strip('\n')
+
+
+def project():
+    return os.path.basename(project_folder())
