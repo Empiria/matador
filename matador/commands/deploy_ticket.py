@@ -14,14 +14,5 @@ class DeployTicket(Command):
             help='Agresso environment name')
 
     def _execute(self):
-        project_folder = utils.project_folder()
-        self._logger.info(project_folder)
-
-        working_folder = utils.working_folder('uog01', self.args.environment)
-        self._logger.info(working_folder)
-
         project = utils.project()
-        self._logger.info(project)
-
-        environments = utils.environments()
-        self._logger.info(environments)
+        utils.update_repository(project)
