@@ -12,7 +12,7 @@ except LookupError:
 
 setup(
     name='Matador',
-    version='0.0.1',
+    version='0.0.5',
     author='Owen Campbell',
     author_email='owen.campbell@empiria.co.uk',
     entry_points={
@@ -22,6 +22,7 @@ setup(
     },
     url='http://www.empiria.co.uk',
     packages=find_packages(),
+    install_requires=['pyyaml'],
     license='The MIT License (MIT)',
     description='Change management for Agresso systems',
     classifiers=[
