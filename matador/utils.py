@@ -30,5 +30,7 @@ def project():
 
 
 def environments():
-    return yaml.load(os.path.join(
-        project_folder(), 'config', 'environments.yml'))
+    file_path = os.path.join(
+        project_folder(), 'config', 'environments.yml')
+    file = open(file_path, 'r')
+    return yaml.load(file)
