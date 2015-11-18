@@ -74,7 +74,7 @@ def update_repository(project, branch='master'):
             f.close()
 
         attributes_file = os.path.join(git_path, 'info', 'attributes')
-        with open(attributes_file, 'a')  as f:
+        with open(attributes_file, 'a') as f:
             f.write('*.sql filter=substitution\n')
             f.write('*.pkb filter=substitution\n')
             f.write('*.pks filter=substitution\n')
