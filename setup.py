@@ -17,7 +17,7 @@ setup(
     author_email='owen.campbell@empiria.co.uk',
     entry_points={
         'console_scripts': [
-            'matador = matador.core.management:execute_command',
+            'matador = matador.management:execute_command',
         ],
     },
     url='http://www.empiria.co.uk',
