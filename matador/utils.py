@@ -65,6 +65,21 @@ def update_repository(project, branch='master'):
             stderr=subprocess.STDOUT,
             stdout=open(os.devnull, 'w'))
 
+        git_path = (os.path.join(repo_folder, '.git'))
+        config_file = os.path.join(git_path, 'config')
+        with open(config_file, 'a') as f:
+            f.write('[filter "substitution"]\n')
+            f.write('        smudge = matador substitute-keywords\n')
+            f.write('        clean = matador clean-keywords\n')
+            f.close()
+
+        attributes_file = os.path.join(git_path, 'info', 'attributes')
+        with open(attributes_file, 'a')  as f:
+            f.write('*.sql filter=substitution\n')
+            f.write('*.pkb filter=substitution\n')
+            f.write('*.pks filter=substitution\n')
+            f.close()
+
     subprocess.run(
         ['git', '-C', repo_folder, 'fetch', 'origin', branch],
         stderr=subprocess.STDOUT,
