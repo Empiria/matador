@@ -13,6 +13,13 @@ class DeployTicket(Command):
             required=True,
             help='Agresso environment name')
 
+        parser.add_argument(
+            '-', '--package',
+            type=bool,
+            default=False,
+            help='Agresso environment name')
+
     def _execute(self):
         project = utils.project()
-        utils.update_repository(project)
+        if not self.args.package:
+            utils.update_repository(project)
