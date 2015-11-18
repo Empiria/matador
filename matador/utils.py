@@ -11,8 +11,14 @@ def working_folder(project, environment):
 
 
 def is_git_repository(path='.'):
-    return subprocess.call(
+    return subprocess.run(
         ['git', '-C', path, 'status'],
         stderr=subprocess.STDOUT,
         stdout=open(os.devnull, 'w')) == 0
 
+
+def project_folder(path='.'):
+    git_output = subprocess.check_output(
+        ['git', '-C', path, 'rev-parse', '--show-toplevel'],
+        stderr=subprocess.STDOUT)
+    return git_output.decode('utf-8')
