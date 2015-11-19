@@ -2,6 +2,7 @@
 from .command import Command
 from matador import utils
 import subprocess
+import glob
 import os
 import shutil
 

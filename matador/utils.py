@@ -72,33 +72,32 @@ def update_repository(project, branch='master'):
             stderr=subprocess.STDOUT,
             stdout=open(os.devnull, 'w'))
 
+        subprocess.run([
+            'git', '-C', repo_folder, 'remote', 'add', 'origin', proj_folder],
+            stderr=subprocess.STDOUT,
+            stdout=open(os.devnull, 'w'))
+
         git_path = (os.path.join(repo_folder, '.git'))
         config_file = os.path.join(git_path, 'config')
         with open(config_file, 'a') as f:
             f.write('[filter "substitution"]\n')
             f.write('        smudge = matador substitute-keywords\n')
             f.write('        clean = matador clean-keywords\n')
-            f.write('[remote "origin"]\n')
-            f.write('       url = %s\n' % proj_folder)
-            f.write('       fetch = +refs/heads/*:refs/remotes/origin/*\n')
-            f.write('[branch "%s"]\n' % branch)
-            f.write('       remote = origin\n')
-            f.write('       merge = refs/heads/%s\n' % branch)
             f.close()
 
-        # attributes_file = os.path.join(git_path, 'info', 'attributes')
-        # with open(attributes_file, 'a') as f:
-        #     f.write('src/ filter=substitution\n')
-        #     f.close()
+        attributes_file = os.path.join(git_path, 'info', 'attributes')
+        with open(attributes_file, 'a') as f:
+            f.write('src/ filter=substitution\n')
+            f.close()
 
         sparse_checkout_file = os.path.join(
             git_path, 'info', 'sparse-checkout')
         with open(sparse_checkout_file, 'a') as f:
-            # f.write('/src')
-            f.write('/deploy')
+            f.write('/src\n')
+            f.write('/deploy\n')
             f.close()
 
     subprocess.run(
-        ['git', '-C', repo_folder, 'fetch', 'origin', branch],
+        ['git', '-C', repo_folder, 'fetch', '-a'],
         stderr=subprocess.STDOUT,
         stdout=open(os.devnull, 'w'))
