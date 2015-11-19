@@ -10,17 +10,15 @@ class SubstituteKeywords(Command):
         substitutions = {
             'version': subprocess.check_output(
                 ['git', 'describe', '--always'],
-                stderr=subprocess.STDOUT),
+                stderr=subprocess.STDOUT).strip('\n'),
             'date': subprocess.check_output(
                 ['git', 'log', '--pretty=format:"%ad"', '-1'],
-                stderr=subprocess.STDOUT),
+                stderr=subprocess.STDOUT).strip('"'),
         }
-        for key, value in substitutions.items():
-            value = re.sub(r'[\n\r\t"\"]', '', value)
 
         for line in sys.stdin:
             for key, value in substitutions.items():
-                rexp = '%s:' % key
+                rexp = '%s:.*' % key
                 line = re.sub(rexp, '%s: %s' % (key, value), line)
             sys.stdout.write(line)
 
