@@ -91,12 +91,12 @@ def update_repository(project, branch='master'):
             f.write('src/ filter=substitution\n')
             f.close()
 
-        sparse_checkout_file = os.path.join(
-            git_path, 'info', 'sparse-checkout')
-        with open(sparse_checkout_file, 'a') as f:
-            f.write('src')
-            f.write('deploy')
-            f.close()
+        # sparse_checkout_file = os.path.join(
+        #     git_path, 'info', 'sparse-checkout')
+        # with open(sparse_checkout_file, 'a') as f:
+        #     f.write('src')
+        #     f.write('deploy')
+        #     f.close()
 
     subprocess.run(
         ['git', '-C', repo_folder, 'fetch', 'origin', branch],

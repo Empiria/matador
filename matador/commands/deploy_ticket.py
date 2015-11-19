@@ -21,7 +21,7 @@ class DeployTicket(Command):
             default=False,
             help='Agresso environment name')
 
-    def _checkout_ticket(project, ticket, branch='master'):
+    def _checkout_ticket(self, project, ticket, branch='master'):
         repo_folder = utils.matador_repository_folder(project)
         subprocess.run([
             'git', '-C', repo_folder, 'checkout', branch],
@@ -32,4 +32,4 @@ class DeployTicket(Command):
         project = utils.project()
         if not self.args.package:
             utils.update_repository(project)
-        self._checkout_ticket(project)
+        self._checkout_ticket(project, 'test')
