@@ -12,7 +12,7 @@ class SubstituteKeywords(Command):
                 ['git', 'describe', '--always'],
                 stderr=subprocess.STDOUT),
             'date': subprocess.check_output(
-                ['git', 'log', '--pretty=format:"%ad"', '-1']
+                ['git', 'log', '--pretty=format:"%ad"', '-1'],
                 stderr=subprocess.STDOUT),
         }
         for key, value in substitutions.items():
