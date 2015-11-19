@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import subprocess
-from classproperty import classproperty
 import yaml
 
 
@@ -60,7 +59,7 @@ class Session(object):
     matador_project_folder = os.path.expanduser('~/.matador/%s' % project)
 
     matador_repository_folder = os.path.join(
-        matador_project_folder(project), 'repository')
+        matador_project_folder, 'repository')
 
     is_git_repository = subprocess.run(
         ['git', 'status'],
@@ -68,38 +67,34 @@ class Session(object):
         stdout=open(os.devnull, 'w')) == 0
 
     environments = get_environments(project_folder)
-    _environment_set = False
 
     os.makedirs(matador_project_folder, exist_ok=True)
     os.makedirs(matador_repository_folder, exist_ok=True)
 
     initialise_repository(project_folder, matador_repository_folder)
 
-    class environment(classproperty):
+    environment = None
 
-        def __get__(self):
-            return self._environment
+    @classmethod
+    def set_environment(self, environment):
+        if self.environment is not None:
+            return
+        else:
+            self.environment = environment
+            self.matador_environment_folder = os.path.join(
+                self.matador_project_folder, environment)
+            self.matador_tickets_folder = os.path.join(
 
-        def __set__(self, environment):
-            if self._environment_set:
-                return
-            else:
-                self._environment = environment
-                self.matador_environment_folder = os.path.join(
-                    self.matador_project_folder, environment)
-                self.matador_tickets_folder = os.path.join(
-                    self.matador_environment_folder, 'tickets')
+                self.matador_environment_folder, 'tickets')
 
-                os.makedirs(self.matador_environment_folder, exist_ok=True)
-                os.makedirs(self.matador_tickets_folder, exist_ok=True)
-
-                self._environment_set = True
+            os.makedirs(self.matador_environment_folder, exist_ok=True)
+            os.makedirs(self.matador_tickets_folder, exist_ok=True)
 
     @classmethod
     def update_repository(self, branch='master'):
         repo_folder = self.matador_repository_folder
 
-        if not self.is_git_repository(repo_folder):
+        if not self.is_git_repository:
             proj_folder = self.project_folder
             initialise_repository(proj_folder, repo_folder)
 

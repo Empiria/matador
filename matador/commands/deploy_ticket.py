@@ -46,9 +46,10 @@ class DeployTicket(Command):
         shutil.rmtree(ticket_folder)
 
     def _execute(self):
-        Session.environment = self.args.environment
+        Session.set_environment(self.args.environment)
         repo_folder = Session.matador_repository_folder
-        ticket_folder = Session.matador_tickets_folder
+        ticket_folder = os.path.join(
+            Session.matador_tickets_folder, self.args.ticket)
 
         if not self.args.packaged:
             Session.update_repository(self.args.branch)
