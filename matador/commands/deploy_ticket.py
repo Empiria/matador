@@ -52,3 +52,6 @@ class DeployTicket(Command):
         if not self.args.package:
             utils.update_repository(project, self.args.branch)
         self._checkout_ticket(repo_folder, ticket_folder, self.args.branch)
+
+        os.chdir(ticket_folder)
+        import deploy
