@@ -74,20 +74,25 @@ class Session(object):
 
     initialise_repository(project_folder, matador_repository_folder)
 
+    _environment_set = False
+
     class environment(classproperty):
 
         def __get__(self):
             return self._environment
 
         def __set__(self, environment):
-            self._environment = environment
-            self.matador_environment_folder = os.path.join(
-                self.matador_project_folder, environment)
-            self.matador_tickets_folder = os.path.join(
-                self.matador_environment_folder, 'tickets')
+            if not self._environment_set:
+                self._environment = environment
+                self.matador_environment_folder = os.path.join(
+                    self.matador_project_folder, environment)
+                self.matador_tickets_folder = os.path.join(
+                    self.matador_environment_folder, 'tickets')
 
-            os.makedirs(self.matador_environment_folder, exist_ok=True)
-            os.makedirs(self.matador_tickets_folder, exist_ok=True)
+                os.makedirs(self.matador_environment_folder, exist_ok=True)
+                os.makedirs(self.matador_tickets_folder, exist_ok=True)
+
+                self._environment_set = True
 
     @classmethod
     def update_repository(self, branch='master'):
