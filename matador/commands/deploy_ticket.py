@@ -47,6 +47,7 @@ class DeployTicket(Command):
         shutil.rmtree(ticket_folder)
 
     def _execute(self):
+
         project = utils.project()
         repo_folder = utils.matador_repository_folder(project)
         ticket_folder = os.path.join(
