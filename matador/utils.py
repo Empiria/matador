@@ -57,7 +57,7 @@ def environments():
     return yaml.load(file)
 
 
-def initialise_repository(repo_folder):
+def initialise_repository(proj_folder, repo_folder):
     subprocess.run([
         'git', '-C', repo_folder, 'init'],
         stderr=subprocess.STDOUT,
@@ -95,14 +95,19 @@ def initialise_repository(repo_folder):
 
 
 def update_repository(project, branch='master'):
-    proj_folder = project_folder()
     repo_folder = matador_repository_folder(project)
 
     if not is_git_repository(repo_folder):
-        initialise_repository(repo_folder)
+        proj_folder = project_folder()
+        initialise_repository(proj_folder, repo_folder)
 
     subprocess.run(
         ['git', '-C', repo_folder, 'fetch', '-a'],
+        stderr=subprocess.STDOUT,
+        stdout=open(os.devnull, 'w'))
+
+    subprocess.run(
+        ['git', '-C', repo_folder, 'checkout', '-b', 'empty'],
         stderr=subprocess.STDOUT,
         stdout=open(os.devnull, 'w'))
 
