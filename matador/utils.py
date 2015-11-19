@@ -57,45 +57,49 @@ def environments():
     return yaml.load(file)
 
 
+def initialise_repository(repo_folder):
+    subprocess.run([
+        'git', '-C', repo_folder, 'init'],
+        stderr=subprocess.STDOUT,
+        stdout=open(os.devnull, 'w'))
+
+    subprocess.run([
+        'git', '-C', repo_folder, 'config', 'core.sparsecheckout', 'true'],
+        stderr=subprocess.STDOUT,
+        stdout=open(os.devnull, 'w'))
+
+    subprocess.run([
+        'git', '-C', repo_folder, 'remote', 'add', 'origin', proj_folder],
+        stderr=subprocess.STDOUT,
+        stdout=open(os.devnull, 'w'))
+
+    git_path = (os.path.join(repo_folder, '.git'))
+    config_file = os.path.join(git_path, 'config')
+    with open(config_file, 'a') as f:
+        f.write('[filter "substitution"]\n')
+        f.write('        smudge = matador substitute-keywords\n')
+        f.write('        clean = matador clean-keywords\n')
+        f.close()
+
+    attributes_file = os.path.join(git_path, 'info', 'attributes')
+    with open(attributes_file, 'a') as f:
+        f.write('src/ filter=substitution\n')
+        f.close()
+
+    sparse_checkout_file = os.path.join(
+        git_path, 'info', 'sparse-checkout')
+    with open(sparse_checkout_file, 'a') as f:
+        f.write('/src\n')
+        f.write('/deploy\n')
+        f.close()
+
+
 def update_repository(project, branch='master'):
     proj_folder = project_folder()
     repo_folder = matador_repository_folder(project)
 
     if not is_git_repository(repo_folder):
-        subprocess.run([
-            'git', '-C', repo_folder, 'init'],
-            stderr=subprocess.STDOUT,
-            stdout=open(os.devnull, 'w'))
-
-        subprocess.run([
-            'git', '-C', repo_folder, 'config', 'core.sparsecheckout', 'true'],
-            stderr=subprocess.STDOUT,
-            stdout=open(os.devnull, 'w'))
-
-        subprocess.run([
-            'git', '-C', repo_folder, 'remote', 'add', 'origin', proj_folder],
-            stderr=subprocess.STDOUT,
-            stdout=open(os.devnull, 'w'))
-
-        git_path = (os.path.join(repo_folder, '.git'))
-        config_file = os.path.join(git_path, 'config')
-        with open(config_file, 'a') as f:
-            f.write('[filter "substitution"]\n')
-            f.write('        smudge = matador substitute-keywords\n')
-            f.write('        clean = matador clean-keywords\n')
-            f.close()
-
-        attributes_file = os.path.join(git_path, 'info', 'attributes')
-        with open(attributes_file, 'a') as f:
-            f.write('src/ filter=substitution\n')
-            f.close()
-
-        sparse_checkout_file = os.path.join(
-            git_path, 'info', 'sparse-checkout')
-        with open(sparse_checkout_file, 'a') as f:
-            f.write('/src\n')
-            f.write('/deploy\n')
-            f.close()
+        initialise_repository(repo_folder)
 
     subprocess.run(
         ['git', '-C', repo_folder, 'fetch', '-a'],
