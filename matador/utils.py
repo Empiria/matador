@@ -86,10 +86,10 @@ def update_repository(project, branch='master'):
             f.write('       merge = refs/heads/%s\n' % branch)
             f.close()
 
-        attributes_file = os.path.join(git_path, 'info', 'attributes')
-        with open(attributes_file, 'a') as f:
-            f.write('src/ filter=substitution\n')
-            f.close()
+        # attributes_file = os.path.join(git_path, 'info', 'attributes')
+        # with open(attributes_file, 'a') as f:
+        #     f.write('src/ filter=substitution\n')
+        #     f.close()
 
         # sparse_checkout_file = os.path.join(
         #     git_path, 'info', 'sparse-checkout')
