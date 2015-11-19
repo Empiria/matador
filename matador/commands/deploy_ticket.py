@@ -3,6 +3,7 @@ from .command import Command
 from matador import utils
 import subprocess
 import os
+import shutil
 
 
 class DeployTicket(Command):
@@ -24,24 +25,30 @@ class DeployTicket(Command):
         parser.add_argument(
             '-b', '--branch',
             type=str,
-            default='master',
+            required=True,
             help='Branch name')
 
         parser.add_argument(
-            '-', '--package',
+            '-p', '--package',
             type=bool,
             default=False,
-            help='Agresso environment name')
+            help='Whether this deployment is part of a package')
 
-    def _checkout_ticket(self, project, ticket, branch='master'):
-        repo_folder = utils.matador_repository_folder(project)
+    def _checkout_ticket(self, repo_folder, ticket_folder, branch):
         subprocess.run([
             'git', '-C', repo_folder, 'checkout', branch],
             stderr=subprocess.STDOUT,
             stdout=open(os.devnull, 'w'))
+        src = os.path.join(repo_folder, 'deploy', 'tickets', self.args.ticket)
+        shutil.copytree(src, ticket_folder)
 
     def _execute(self):
         project = utils.project()
+        repo_folder = utils.matador_repository_folder(project)
+        ticket_folder = os.path.join(
+            utils.matador_ticket_folder(project, self.args.environment),
+            self.args.ticket)
+
         if not self.args.package:
             utils.update_repository(project, self.args.branch)
-        self._checkout_ticket(project, self.args.ticket)
+        self._checkout_ticket(repo_folder, ticket_folder, self.args.branch)
