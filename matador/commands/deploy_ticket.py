@@ -46,7 +46,6 @@ class DeployTicket(Command):
         shutil.rmtree(ticket_folder)
 
     def _execute(self):
-        Session.set_environment(self.args.environment)
         repo_folder = Session.matador_repository_folder
         ticket_folder = os.path.join(
             Session.matador_tickets_folder, self.args.ticket)
