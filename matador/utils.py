@@ -101,3 +101,17 @@ def update_repository(project, branch='master'):
         ['git', '-C', repo_folder, 'fetch', '-a'],
         stderr=subprocess.STDOUT,
         stdout=open(os.devnull, 'w'))
+
+    empty_file = os.path.join(repo_folder, '.empty')
+    with open(empty_file, 'a') as f:
+        f.write('Minimal file for empty working directory')
+
+    subprocess.run(
+        ['git', '-C', repo_folder, 'add', '-A'],
+        stderr=subprocess.STDOUT,
+        stdout=open(os.devnull, 'w'))
+
+    subprocess.run(
+        ['git', '-C', repo_folder, 'commit', '-m', 'Empty'],
+        stderr=subprocess.STDOUT,
+        stdout=open(os.devnull, 'w'))
