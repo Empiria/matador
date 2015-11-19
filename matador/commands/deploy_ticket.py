@@ -16,6 +16,18 @@ class DeployTicket(Command):
             help='Agresso environment name')
 
         parser.add_argument(
+            '-t', '--ticket',
+            type=str,
+            required=True,
+            help='Ticket name')
+
+        parser.add_argument(
+            '-b', '--branch',
+            type=str,
+            default='master',
+            help='Branch name')
+
+        parser.add_argument(
             '-', '--package',
             type=bool,
             default=False,
@@ -31,5 +43,5 @@ class DeployTicket(Command):
     def _execute(self):
         project = utils.project()
         if not self.args.package:
-            utils.update_repository(project)
-        self._checkout_ticket(project, 'test')
+            utils.update_repository(project, self.args.branch)
+        self._checkout_ticket(project, self.args.ticket)
