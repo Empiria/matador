@@ -8,8 +8,12 @@ class SubstituteKeywords(Command):
 
     def _execute(self):
         substitutions = {
-            'version': subprocess.getoutput('git describe --always'),
-            'date': subprocess.getoutput('git log --pretty=format:"%ad" -1'),
+            'version': subprocess.check_output(
+                ['git', 'describe', '--always'],
+                stderr=subprocess.STDOUT),
+            'date': subprocess.check_output(
+                ['git', 'log', '--pretty=format:"%ad"', '-1']
+                stderr=subprocess.STDOUT),
         }
         for key, value in substitutions.items():
             value = re.sub(r'[\n\r\t"\"]', '', value)
