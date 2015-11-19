@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 from .command import Command
-from matador import utils
+from matador.session import Session
 import subprocess
-import glob
 import os
 import shutil
 
@@ -30,7 +29,7 @@ class DeployTicket(Command):
             help='Branch name')
 
         parser.add_argument(
-            '-p', '--package',
+            '-p', '--packaged',
             type=bool,
             default=False,
             help='Whether this deployment is part of a package')
@@ -47,15 +46,12 @@ class DeployTicket(Command):
         shutil.rmtree(ticket_folder)
 
     def _execute(self):
+        Session.environment = self.args.environment
+        repo_folder = Session.matador_repository_folder
+        ticket_folder = Session.matador_tickets_folder
 
-        project = utils.project()
-        repo_folder = utils.matador_repository_folder(project)
-        ticket_folder = os.path.join(
-            utils.matador_ticket_folder(project, self.args.environment),
-            self.args.ticket)
-
-        if not self.args.package:
-            utils.update_repository(project, self.args.branch)
+        if not self.args.packaged:
+            Session.update_repository(self.args.branch)
         self._checkout_ticket(repo_folder, ticket_folder, self.args.branch)
 
         os.chdir(ticket_folder)
