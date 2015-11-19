@@ -81,7 +81,9 @@ class Session(object):
             return self._environment
 
         def __set__(self, environment):
-            if not self._environment_set:
+            if self._environment_set:
+                return
+            else:
                 self._environment = environment
                 self.matador_environment_folder = os.path.join(
                     self.matador_project_folder, environment)
