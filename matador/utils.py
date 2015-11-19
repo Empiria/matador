@@ -58,11 +58,12 @@ def environments():
 
 
 def update_repository(project, branch='master'):
+    proj_folder = project_folder()
     repo_folder = matador_repository_folder(project)
+
     if not is_git_repository(repo_folder):
         subprocess.run([
-            'git', 'clone', '-n', '-b',
-            branch, project_folder(), repo_folder],
+            'git', '-C', repo_folder, 'init'],
             stderr=subprocess.STDOUT,
             stdout=open(os.devnull, 'w'))
 
@@ -77,6 +78,12 @@ def update_repository(project, branch='master'):
             f.write('[filter "substitution"]\n')
             f.write('        smudge = matador substitute-keywords\n')
             f.write('        clean = matador clean-keywords\n')
+            f.write('[remote "origin"]\n')
+            f.write('       url = %s\n' % proj_folder)
+            f.write('       fetch = +refs/heads/*:refs/remotes/origin/*\n')
+            f.write('[branch "%s"]\n' % branch)
+            f.write('       remote = origin\n')
+            f.write('       merge = refs/heads/%s\n' % branch)
             f.close()
 
         attributes_file = os.path.join(git_path, 'info', 'attributes')

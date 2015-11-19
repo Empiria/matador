@@ -2,6 +2,7 @@
 from .command import Command
 from matador import utils
 import subprocess
+import os
 
 
 class DeployTicket(Command):
@@ -26,7 +27,6 @@ class DeployTicket(Command):
             'git', '-C', repo_folder, 'checkout', branch],
             stderr=subprocess.STDOUT,
             stdout=open(os.devnull, 'w'))
-
 
     def _execute(self):
         project = utils.project()
