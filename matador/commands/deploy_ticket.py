@@ -42,6 +42,9 @@ class DeployTicket(Command):
         src = os.path.join(repo_folder, 'deploy', 'tickets', self.args.ticket)
         shutil.copytree(src, ticket_folder)
 
+    def _cleanup(self, ticket_folder):
+        shutil.rmtree(ticket_folder)
+
     def _execute(self):
         project = utils.project()
         repo_folder = utils.matador_repository_folder(project)
@@ -55,3 +58,5 @@ class DeployTicket(Command):
 
         os.chdir(ticket_folder)
         import deploy
+
+        self._cleanup(ticket_folder)
