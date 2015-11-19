@@ -68,13 +68,12 @@ class Session(object):
         stdout=open(os.devnull, 'w')) == 0
 
     environments = get_environments(project_folder)
+    _environment_set = False
 
     os.makedirs(matador_project_folder, exist_ok=True)
     os.makedirs(matador_repository_folder, exist_ok=True)
 
     initialise_repository(project_folder, matador_repository_folder)
-
-    _environment_set = False
 
     class environment(classproperty):
 
