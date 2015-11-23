@@ -49,7 +49,7 @@ class Session(object):
     environment = None
 
     @classmethod
-    def initialise_session(self):
+    def _initialise_session(self):
         self.project_folder = subprocess.check_output(
             ['git', 'rev-parse', '--show-toplevel'],
             stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
@@ -82,7 +82,7 @@ class Session(object):
         if self.environment is not None:
             return
         else:
-            self.initialise_session()
+            self._initialise_session()
             self.environment = self.environments[environment]
             credentials = get_credentials(self.project_folder)
             self.credentials = credentials[environment]
