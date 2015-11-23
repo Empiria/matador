@@ -69,7 +69,6 @@ class RunSqlScript(Command):
             help='Agresso environment')
 
     def _execute(self):
-        Session.initialise_session()
         Session.set_environment(self.args.environment)
 
         file_path = os.path.join(self.args.directory, self.args.file)
