@@ -55,6 +55,7 @@ class DeployTicket(Command):
         repo_folder = Session.matador_repository_folder
         ticket_folder = os.path.join(
             Session.matador_tickets_folder, self.args.ticket)
+        Session.ticket_folder = ticket_folder
 
         if not self.args.packaged:
             Session.update_repository()
