@@ -89,7 +89,6 @@ class Session(object):
             self.matador_environment_folder = os.path.join(
                 self.matador_project_folder, environment)
             self.matador_tickets_folder = os.path.join(
-
                 self.matador_environment_folder, 'tickets')
 
             os.makedirs(self.matador_environment_folder, exist_ok=True)
