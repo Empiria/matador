@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from .deployment_command import DeploymentCommand
+from .deployment import DeploymentCommand
 import platform
 
 
