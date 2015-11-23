@@ -32,7 +32,7 @@ class DeploySqlScript(DeploymentCommand):
                 originalText, repo_folder, commit)
             originalFile.close()
 
-            newFile = open(script, 'w')
+            newFile = open(targetScript, 'w')
             newFile.write(newText)
             newFile.close()
 
