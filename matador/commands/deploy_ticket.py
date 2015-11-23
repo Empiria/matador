@@ -36,15 +36,13 @@ class DeployTicket(Command):
             help='Whether this deployment is part of a package')
 
     def _checkout_ticket(self, repo_folder, ticket_folder, commit):
-        if commit == 'none':
-            commit = subprocess.check_output(
-                ['git', 'rev-parse', 'HEAD'],
-                stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
 
         subprocess.run([
             'git', '-C', repo_folder, 'checkout', commit],
             stderr=subprocess.STDOUT,
-            stdout=open(os.devnull, 'w'))
+            stdout=open(os.devnull, 'w'),
+            check=True)
+
         src = os.path.join(repo_folder, 'deploy', 'tickets', self.args.ticket)
         shutil.copytree(src, ticket_folder)
 
@@ -52,6 +50,7 @@ class DeployTicket(Command):
         shutil.rmtree(ticket_folder)
 
     def _execute(self):
+        proj_folder = Session.project_folder
         repo_folder = Session.matador_repository_folder
         ticket_folder = os.path.join(
             Session.matador_tickets_folder, self.args.ticket)
@@ -59,10 +58,19 @@ class DeployTicket(Command):
 
         if not self.args.packaged:
             Session.update_repository()
-        self._checkout_ticket(repo_folder, ticket_folder, self.args.commit)
 
-        os.chdir(ticket_folder)
+        if self.args.commit == 'none':
+            commit = subprocess.check_output(
+                ['git', '-C', proj_folder, 'rev-parse', 'HEAD'],
+                stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
+        else:
+            commit = self.args['commit']
+
+        self._checkout_ticket(repo_folder, ticket_folder, commit)
+
+        deploy_file = os.path.join(ticket_folder, 'deploy.py')
         try:
-            import deploy
+            from importlib.machinery import SourceFileLoader
+            SourceFileLoader('deploy', deploy_file).load_module()
         finally:
             self._cleanup(ticket_folder)

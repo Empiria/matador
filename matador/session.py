@@ -78,7 +78,7 @@ class Session(object):
         matador_project_folder, 'repository')
 
     is_git_repository = subprocess.run(
-        ['git', 'status'],
+        ['git', '-C', matador_repository_folder, 'status'],
         stderr=subprocess.STDOUT,
         stdout=open(os.devnull, 'w')) == 0
 
@@ -86,8 +86,6 @@ class Session(object):
 
     os.makedirs(matador_project_folder, exist_ok=True)
     os.makedirs(matador_repository_folder, exist_ok=True)
-
-    initialise_repository(project_folder, matador_repository_folder)
 
     environment = None
 
@@ -113,7 +111,13 @@ class Session(object):
     def update_repository(self):
         repo_folder = self.matador_repository_folder
 
-        if not self.is_git_repository:
+        try:
+            subprocess.run(
+                ['git', '-C', repo_folder, 'status'],
+                stderr=subprocess.STDOUT,
+                stdout=open(os.devnull, 'w'),
+                check = True)
+        except subprocess.CalledProcessError:
             proj_folder = self.project_folder
             initialise_repository(proj_folder, repo_folder)
 
