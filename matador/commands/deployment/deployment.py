@@ -10,8 +10,8 @@ def substitute_keywords(text, repo_folder, commit):
             ['git', '-C', repo_folder, 'show', '-s', '--format=%ci', commit],
             stderr=subprocess.STDOUT),
     }
-    new_text = None
-    for line in text:
+    new_text = ''
+    for line in text.splitlines(keepends=True):
         for key, value in substitutions.items():
             rexp = '%s:.*' % key
             line = re.sub(rexp, '%s: %s' % (key, value), line)
