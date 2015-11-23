@@ -12,7 +12,7 @@ class DeploySqlScript(DeploymentCommand):
     def _execute(self):
         scriptPath = self.args[0]
 
-        if len(os.dirname(scriptPath)) == 0:
+        if len(os.path.dirname(scriptPath)) == 0:
             script = os.path.join(Session.ticket_folder, scriptPath)
         else:
             repo_folder = Session.matador_repository_folder
