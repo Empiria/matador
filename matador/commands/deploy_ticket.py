@@ -26,7 +26,7 @@ class DeployTicket(Command):
         parser.add_argument(
             '-c', '--commit',
             type=str,
-            default='head',
+            default='none',
             help='Branch name')
 
         parser.add_argument(
@@ -36,6 +36,11 @@ class DeployTicket(Command):
             help='Whether this deployment is part of a package')
 
     def _checkout_ticket(self, repo_folder, ticket_folder, commit):
+        if commit == 'none':
+            commit = subprocess.check_output(
+                ['git', 'rev-parse', 'HEAD'],
+                stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
+
         subprocess.run([
             'git', '-C', repo_folder, 'checkout', commit],
             stderr=subprocess.STDOUT,
@@ -56,6 +61,7 @@ class DeployTicket(Command):
         self._checkout_ticket(repo_folder, ticket_folder, self.args.commit)
 
         os.chdir(ticket_folder)
-        import deploy
-
-        self._cleanup(ticket_folder)
+        try:
+            import deploy
+        finally:
+            self._cleanup(ticket_folder)

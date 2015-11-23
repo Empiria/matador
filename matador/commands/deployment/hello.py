@@ -7,5 +7,5 @@ class Hello(DeploymentCommand):
 
     def _execute(self):
         self._logger.info('Hello')
-        self._logger.info(self.args.message)
+        self._logger.info(self.args[0])
         self._logger.info(platform.python_version())

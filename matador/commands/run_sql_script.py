@@ -17,8 +17,7 @@ def _sql_script(file_path):
     return script
 
 
-def run_sql_script(logger, file_path, dbms, connection):
-        script = _sql_script(file_path)
+def run_sql_script(logger, file_path):
 
         message = Template(
             'Matador: Executing ${file} against ${connection} \n')
@@ -28,12 +27,19 @@ def run_sql_script(logger, file_path, dbms, connection):
         }
         logger.info(message.substitute(substitutions))
 
+        script = _sql_script(file_path)
+        connection_string = _connection_string(
+            Session.environment['dbms'],
+            Session.environment['connection'],
+            Session.credentials['user'],
+            Session.credentials['password'])
+
         os.chdir(os.path.dirname(file_path))
 
-        if dbms.lower() == 'oracle':
+        if Session.environment['dbms'].lower() == 'oracle':
             script += '\nshow error'
             process = subprocess.Popen(
-                ['sqlplus', '-S', '-L', connection],
+                ['sqlplus', '-S', '-L', connection_string],
                 stdin=subprocess.PIPE,
                 stderr=subprocess.PIPE)
             process.stdin.write(script.encode('utf-8'))
@@ -66,13 +72,6 @@ class RunSqlScript(Command):
     def _execute(self):
         file_path = os.path.join(self.args.directory, self.args.file)
 
-        connection_string = _connection_string(
-            Session.environment['dbms'],
-            Session.environment['connection'],
-            Session.credentials['user'],
-            Session.credentials['password'])
         run_sql_script(
             self._logger,
-            file_path,
-            Session.environment['dbms'],
-            connection_string)
+            file_path)
