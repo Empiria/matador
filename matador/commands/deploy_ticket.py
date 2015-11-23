@@ -68,6 +68,8 @@ class DeployTicket(Command):
         else:
             commit = self.args['commit']
 
+        self._logger.debug(commit)
+
         self._checkout_ticket(repo_folder, ticket_folder, commit)
 
         deploy_file = os.path.join(ticket_folder, 'deploy.py')

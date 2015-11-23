@@ -120,31 +120,12 @@ class Session(object):
                 ['git', '-C', repo_folder, 'status'],
                 stderr=subprocess.STDOUT,
                 stdout=open(os.devnull, 'w'),
-                check = True)
+                check=True)
         except subprocess.CalledProcessError:
             proj_folder = self.project_folder
             initialise_repository(proj_folder, repo_folder)
 
         subprocess.run(
             ['git', '-C', repo_folder, 'fetch', '-a'],
-            stderr=subprocess.STDOUT,
-            stdout=open(os.devnull, 'w'))
-
-        subprocess.run(
-            ['git', '-C', repo_folder, 'checkout', '-b', 'empty'],
-            stderr=subprocess.STDOUT,
-            stdout=open(os.devnull, 'w'))
-
-        empty_file = os.path.join(repo_folder, '.empty')
-        with open(empty_file, 'a') as f:
-            f.write('Minimal file for empty working directory')
-
-        subprocess.run(
-            ['git', '-C', repo_folder, 'add', '-A'],
-            stderr=subprocess.STDOUT,
-            stdout=open(os.devnull, 'w'))
-
-        subprocess.run(
-            ['git', '-C', repo_folder, 'commit', '-m', 'Empty'],
             stderr=subprocess.STDOUT,
             stdout=open(os.devnull, 'w'))

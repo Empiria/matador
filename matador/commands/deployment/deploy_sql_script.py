@@ -19,15 +19,20 @@ class DeploySqlScript(DeploymentCommand):
             scriptPath = os.path.join(repo_folder, self.args[0])
             commit = self.args[1]
 
-            checkout = subprocess.check_call([
-                'git', '-C', repo_folder, 'checkout', commit],
+            subprocess.run(
+                ['git', '-C', repo_folder, 'checkout', commit],
                 stderr=subprocess.STDOUT,
-                stdout=open(os.devnull, 'w'))
+                stdout=open(os.devnull, 'w'),
+                check=True)
 
-            if checkout == 0:
-                script = shutil.copy(scriptPath, Session.ticket_folder)
-            else:
-                self._logger.info('Could not checkout %s' % commit)
-                return
+            os.remove(scriptPath)
+
+            subprocess.run(
+                ['git', '-C', repo_folder, 'checkout', scriptPath],
+                stderr=subprocess.STDOUT,
+                stdout=open(os.devnull, 'w'),
+                check=True)
+
+            script = shutil.copy(scriptPath, Session.ticket_folder)
 
         run_sql_script(self._logger, script)
