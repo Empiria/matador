@@ -16,6 +16,17 @@ def get_environments(project_folder):
     return yaml.load(file)
 
 
+def get_credentials(project_folder):
+    file_path = os.path.join(
+        project_folder, 'config', 'credentials.yml')
+    try:
+        file = open(file_path, 'r')
+    except FileNotFoundError:
+        print('Cannot find credentials.yml file')
+        sys.exit()
+    return yaml.load(file)
+
+
 def initialise_repository(proj_folder, repo_folder):
     subprocess.run([
         'git', '-C', repo_folder, 'init'],
@@ -86,6 +97,9 @@ class Session(object):
             return
         else:
             self.environment = self.environments[environment]
+            credentials = get_credentials(self.project_folder)
+            self.credentials = credentials[environment]
+
             self.matador_environment_folder = os.path.join(
                 self.matador_project_folder, environment)
             self.matador_tickets_folder = os.path.join(

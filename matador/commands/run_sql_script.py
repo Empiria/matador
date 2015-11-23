@@ -40,18 +40,6 @@ class RunSqlScript(Command):
             required=True,
             help='Agresso environment')
 
-        parser.add_argument(
-            '-u', '--user',
-            type=str,
-            required=True,
-            help='Database user')
-
-        parser.add_argument(
-            '-p', '--password',
-            type=str,
-            required=True,
-            help='Password')
-
     def _runScript(self, file_path, dbms, connection):
         script = _sql_script(file_path)
 
@@ -80,7 +68,7 @@ class RunSqlScript(Command):
         connection_string = _connection_string(
             Session.environment['dbms'],
             Session.environment['connection'],
-            self.args.user,
-            self.args.password)
+            Session.credentials['user'],
+            Session.credentials['password'])
         self._runScript(
             file_path, Session.environment['dbms'], connection_string)
