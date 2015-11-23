@@ -34,10 +34,7 @@ def initialise_repository(proj_folder, repo_folder):
         stderr=subprocess.STDOUT,
         stdout=open(os.devnull, 'w'))
 
-    attributes_file = os.path.join(git_path, 'info', 'attributes')
-    with open(attributes_file, 'a') as f:
-        f.write('src/** filter=substitution\n')
-        f.close()
+    git_path = (os.path.join(repo_folder, '.git'))
 
     sparse_checkout_file = os.path.join(
         git_path, 'info', 'sparse-checkout')
