@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from .command import Command
+from matador.commands.deployment import *
 from matador.session import Session
 import subprocess
 import os
