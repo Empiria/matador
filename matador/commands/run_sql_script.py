@@ -14,8 +14,31 @@ def _connection_string(dbms, connection, user, password):
 def _sql_script(file_path):
     file = open(file_path, 'r')
     script = file.read()
-    script += '\nshow error'
     return script
+
+
+def runScript(logger, file_path, dbms, connection):
+        script = _sql_script(file_path)
+
+        message = Template(
+            'Matador: Executing ${file} against ${connection} \n')
+        substitutions = {
+            'file': os.path.basename(file_path),
+            'connection': Session.environment['connection']
+        }
+        logger.info(message.substitute(substitutions))
+
+        os.chdir(os.path.dirname(file_path))
+
+        if dbms.lower() == 'oracle':
+            script += '\nshow error'
+            process = subprocess.Popen(
+                ['sqlplus', '-S', '-L', connection],
+                stdin=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+            process.stdin.write(script.encode('utf-8'))
+            process.stdin.close()
+            process.wait()
 
 
 class RunSqlScript(Command):
@@ -40,35 +63,16 @@ class RunSqlScript(Command):
             required=True,
             help='Agresso environment')
 
-    def _runScript(self, file_path, dbms, connection):
-        script = _sql_script(file_path)
-
-        os.chdir(os.path.dirname(file_path))
-
-        if dbms.lower() == 'oracle':
-            process = subprocess.Popen(
-                ['sqlplus', '-S', '-L', connection],
-                stdin=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-            process.stdin.write(script.encode('utf-8'))
-            process.stdin.close()
-            process.wait()
-
     def _execute(self):
         file_path = os.path.join(self.args.directory, self.args.file)
-
-        message = Template(
-            'Matador: Executing ${file} against ${connection} \n')
-        substitutions = {
-            'file': os.path.basename(file_path),
-            'connection': Session.environment['connection']
-        }
-        self._logger.info(message.substitute(substitutions))
 
         connection_string = _connection_string(
             Session.environment['dbms'],
             Session.environment['connection'],
             Session.credentials['user'],
             Session.credentials['password'])
-        self._runScript(
-            file_path, Session.environment['dbms'], connection_string)
+        runScript(
+            self._logger,
+            file_path,
+            Session.environment['dbms'],
+            connection_string)
