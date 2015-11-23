@@ -82,6 +82,7 @@ class Session(object):
         if self.environment is not None:
             return
         else:
+            self.initialise_session()
             self.environment = self.environments[environment]
             credentials = get_credentials(self.project_folder)
             self.credentials = credentials[environment]
