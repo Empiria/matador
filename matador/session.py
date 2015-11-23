@@ -43,13 +43,13 @@ def initialise_repository(proj_folder, repo_folder):
     config_file = os.path.join(git_path, 'config')
     with open(config_file, 'a') as f:
         f.write('[filter "substitution"]\n')
-        f.write('        smudge = matador substitute-keywords\n')
-        f.write('        clean = matador clean-keywords\n')
+        f.write('    smudge = matador substitute-keywords\n')
+        f.write('    clean = matador clean-keywords\n')
         f.close()
 
     attributes_file = os.path.join(git_path, 'info', 'attributes')
     with open(attributes_file, 'a') as f:
-        f.write('src/ filter=substitution\n')
+        f.write('src/** filter=substitution\n')
         f.close()
 
     sparse_checkout_file = os.path.join(
