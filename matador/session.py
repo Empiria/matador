@@ -2,12 +2,17 @@
 import os
 import subprocess
 import yaml
+import sys
 
 
 def get_environments(project_folder):
     file_path = os.path.join(
         project_folder, 'config', 'environments.yml')
-    file = open(file_path, 'r')
+    try:
+        file = open(file_path, 'r')
+    except FileNotFoundError:
+        print('Cannot find environments.yml file')
+        sys.exit()
     return yaml.load(file)
 
 
@@ -91,7 +96,7 @@ class Session(object):
             os.makedirs(self.matador_tickets_folder, exist_ok=True)
 
     @classmethod
-    def update_repository(self, branch='master'):
+    def update_repository(self):
         repo_folder = self.matador_repository_folder
 
         if not self.is_git_repository:

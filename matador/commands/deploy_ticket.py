@@ -23,7 +23,7 @@ class DeployTicket(Command):
             help='Ticket name')
 
         parser.add_argument(
-            '-b', '--branch',
+            '-c', '--commit',
             type=str,
             default='master',
             help='Branch name')
@@ -34,9 +34,9 @@ class DeployTicket(Command):
             default=False,
             help='Whether this deployment is part of a package')
 
-    def _checkout_ticket(self, repo_folder, ticket_folder, branch):
+    def _checkout_ticket(self, repo_folder, ticket_folder, commit):
         subprocess.run([
-            'git', '-C', repo_folder, 'checkout', branch],
+            'git', '-C', repo_folder, 'checkout', commit],
             stderr=subprocess.STDOUT,
             stdout=open(os.devnull, 'w'))
         src = os.path.join(repo_folder, 'deploy', 'tickets', self.args.ticket)
@@ -51,8 +51,8 @@ class DeployTicket(Command):
             Session.matador_tickets_folder, self.args.ticket)
 
         if not self.args.packaged:
-            Session.update_repository(self.args.branch)
-        self._checkout_ticket(repo_folder, ticket_folder, self.args.branch)
+            Session.update_repository()
+        self._checkout_ticket(repo_folder, ticket_folder, self.args.commit)
 
         os.chdir(ticket_folder)
         import deploy
