@@ -8,7 +8,7 @@ def substitute_keywords(text, repo_folder, commit):
         'version': commit,
         'date': subprocess.check_output(
             ['git', '-C', repo_folder, 'show', '-s', '--format=%ci', commit],
-            stderr=subprocess.STDOUT),
+            stderr=subprocess.STDOUT).decode().strip('\n'),
     }
     new_text = ''
     for line in text.splitlines(keepends=True):
