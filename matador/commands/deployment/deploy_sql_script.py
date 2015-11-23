@@ -25,14 +25,6 @@ class DeploySqlScript(DeploymentCommand):
                 stdout=open(os.devnull, 'w'),
                 check=True)
 
-            os.remove(scriptPath)
-
-            subprocess.run(
-                ['git', '-C', repo_folder, 'checkout', scriptPath],
-                stderr=subprocess.STDOUT,
-                stdout=open(os.devnull, 'w'),
-                check=True)
-
             script = shutil.copy(scriptPath, Session.ticket_folder)
 
         run_sql_script(self._logger, script)
