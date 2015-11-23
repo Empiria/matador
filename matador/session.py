@@ -2,7 +2,6 @@
 import os
 import subprocess
 import yaml
-import sys
 
 
 def get_environments(project_folder):
@@ -15,11 +14,7 @@ def get_environments(project_folder):
 def get_credentials(project_folder):
     file_path = os.path.join(
         project_folder, 'config', 'credentials.yml')
-    try:
-        file = open(file_path, 'r')
-    except FileNotFoundError:
-        print('Cannot find credentials.yml file')
-        sys.exit()
+    file = open(file_path, 'r')
     return yaml.load(file)
 
 
