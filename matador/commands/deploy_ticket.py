@@ -25,7 +25,7 @@ class DeployTicket(Command):
         parser.add_argument(
             '-c', '--commit',
             type=str,
-            default='master',
+            default='head',
             help='Branch name')
 
         parser.add_argument(
