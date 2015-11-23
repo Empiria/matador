@@ -17,7 +17,7 @@ def _sql_script(file_path):
     return script
 
 
-def runScript(logger, file_path, dbms, connection):
+def run_sql_script(logger, file_path, dbms, connection):
         script = _sql_script(file_path)
 
         message = Template(
@@ -71,7 +71,7 @@ class RunSqlScript(Command):
             Session.environment['connection'],
             Session.credentials['user'],
             Session.credentials['password'])
-        runScript(
+        run_sql_script(
             self._logger,
             file_path,
             Session.environment['dbms'],
