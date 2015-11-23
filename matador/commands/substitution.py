@@ -10,10 +10,10 @@ class SubstituteKeywords(Command):
         substitutions = {
             'version': subprocess.check_output(
                 ['git', 'describe', '--always'],
-                stderr=subprocess.STDOUT).strip('\n'),
+                stderr=subprocess.STDOUT).decode().strip('\n'),
             'date': subprocess.check_output(
                 ['git', 'log', '--pretty=format:"%ad"', '-1'],
-                stderr=subprocess.STDOUT).strip('"'),
+                stderr=subprocess.STDOUT).decode().strip('"'),
         }
 
         for line in sys.stdin:

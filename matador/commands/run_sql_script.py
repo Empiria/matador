@@ -18,33 +18,32 @@ def _sql_script(file_path):
 
 
 def run_sql_script(logger, file_path):
+    message = Template(
+        'Matador: Executing ${file} against ${connection} \n')
+    substitutions = {
+        'file': os.path.basename(file_path),
+        'connection': Session.environment['connection']
+    }
+    logger.info(message.substitute(substitutions))
 
-        message = Template(
-            'Matador: Executing ${file} against ${connection} \n')
-        substitutions = {
-            'file': os.path.basename(file_path),
-            'connection': Session.environment['connection']
-        }
-        logger.info(message.substitute(substitutions))
+    script = _sql_script(file_path)
+    connection_string = _connection_string(
+        Session.environment['dbms'],
+        Session.environment['connection'],
+        Session.credentials['user'],
+        Session.credentials['password'])
 
-        script = _sql_script(file_path)
-        connection_string = _connection_string(
-            Session.environment['dbms'],
-            Session.environment['connection'],
-            Session.credentials['user'],
-            Session.credentials['password'])
+    os.chdir(os.path.dirname(file_path))
 
-        os.chdir(os.path.dirname(file_path))
-
-        if Session.environment['dbms'].lower() == 'oracle':
-            script += '\nshow error'
-            process = subprocess.Popen(
-                ['sqlplus', '-S', '-L', connection_string],
-                stdin=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-            process.stdin.write(script.encode('utf-8'))
-            process.stdin.close()
-            process.wait()
+    if Session.environment['dbms'].lower() == 'oracle':
+        script += '\nshow error'
+        process = subprocess.Popen(
+            ['sqlplus', '-S', '-L', connection_string],
+            stdin=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        process.stdin.write(script.encode('utf-8'))
+        process.stdin.close()
+        process.wait()
 
 
 class RunSqlScript(Command):
@@ -70,6 +69,9 @@ class RunSqlScript(Command):
             help='Agresso environment')
 
     def _execute(self):
+        Session.initialise_session()
+        Session.set_environment(self.args.environment)
+
         file_path = os.path.join(self.args.directory, self.args.file)
 
         run_sql_script(

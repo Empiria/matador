@@ -12,13 +12,18 @@ except LookupError:
 
 setup(
     name='Matador',
-    version='0.0.30',
+    version='0.0.40',
     author='Owen Campbell',
     author_email='owen.campbell@empiria.co.uk',
     entry_points={
         'console_scripts': [
             'matador = matador.management:execute_command',
         ],
+    },
+    options = {
+        'build_scripts': {
+            'executable': '/usr/bin/env python3',
+        },
     },
     url='http://www.empiria.co.uk',
     packages=find_packages(),

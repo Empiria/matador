@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import logging
 import argparse
-from matador.session import Session
 
 
 class Command(object):
@@ -12,10 +11,6 @@ class Command(object):
         self._logger = logging.getLogger(__name__)
         self._add_arguments(parser)
         self.args, unknown = parser.parse_known_args()
-        try:
-            Session.set_environment(self.args.environment)
-        except AttributeError:
-            pass
         self._execute()
 
     def _add_arguments(self, parser):

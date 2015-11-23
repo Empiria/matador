@@ -6,14 +6,10 @@ import sys
 
 
 def get_environments(project_folder):
-    file_path = os.path.join(
-        project_folder, 'config', 'environments.yml')
-    try:
+        file_path = os.path.join(
+            project_folder, 'config', 'environments.yml')
         file = open(file_path, 'r')
-    except FileNotFoundError:
-        print('Cannot find environments.yml file')
-        sys.exit()
-    return yaml.load(file)
+        return yaml.load(file)
 
 
 def get_credentials(project_folder):
@@ -66,28 +62,36 @@ def initialise_repository(proj_folder, repo_folder):
 
 class Session(object):
 
-    project_folder = subprocess.check_output(
-        ['git', 'rev-parse', '--show-toplevel'],
-        stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
-
-    project = os.path.basename(project_folder)
-
-    matador_project_folder = os.path.expanduser('~/.matador/%s' % project)
-
-    matador_repository_folder = os.path.join(
-        matador_project_folder, 'repository')
-
-    is_git_repository = subprocess.run(
-        ['git', '-C', matador_repository_folder, 'status'],
-        stderr=subprocess.STDOUT,
-        stdout=open(os.devnull, 'w')) == 0
-
-    environments = get_environments(project_folder)
-
-    os.makedirs(matador_project_folder, exist_ok=True)
-    os.makedirs(matador_repository_folder, exist_ok=True)
-
     environment = None
+
+    @classmethod
+    def initialise_session(self):
+        self.project_folder = subprocess.check_output(
+            ['git', 'rev-parse', '--show-toplevel'],
+            stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
+
+        self.project = os.path.basename(self.project_folder)
+
+        self.matador_project_folder = os.path.expanduser(
+            '~/.matador/%s' % self.project)
+
+        self.matador_repository_folder = os.path.join(
+            self.matador_project_folder, 'repository')
+
+        self.environments = get_environments(self.project_folder)
+
+        os.makedirs(self.matador_project_folder, exist_ok=True)
+        os.makedirs(self.matador_repository_folder, exist_ok=True)
+
+        try:
+            subprocess.run(
+                ['git', '-C', self.matador_repository_folder, 'status'],
+                stderr=subprocess.STDOUT,
+                stdout=open(os.devnull, 'w'),
+                check=True)
+        except subprocess.CalledProcessError:
+            initialise_repository(
+                self.project_folder, self.matador_repository_folder)
 
     @classmethod
     def set_environment(self, environment):
