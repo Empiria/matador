@@ -12,11 +12,11 @@ class DeploySqlScript(DeploymentCommand):
         scriptPath = self.args[0]
 
         if len(os.path.dirname(scriptPath)) == 0:
-            script = os.path.join(Session.ticket_folder, scriptPath)
+            targetScript = os.path.join(Session.ticket_folder, scriptPath)
         else:
             repo_folder = Session.matador_repository_folder
             scriptPath = os.path.join(repo_folder, self.args[0])
-            script = os.path.join(
+            targetScript = os.path.join(
                 Session.ticket_folder, os.path.basename(scriptPath))
             commit = self.args[1]
 
@@ -36,4 +36,4 @@ class DeploySqlScript(DeploymentCommand):
             newFile.write(newText)
             newFile.close()
 
-        run_sql_script(self._logger, script)
+        run_sql_script(self._logger, targetScript)
