@@ -34,14 +34,6 @@ def initialise_repository(proj_folder, repo_folder):
         stderr=subprocess.STDOUT,
         stdout=open(os.devnull, 'w'))
 
-    git_path = (os.path.join(repo_folder, '.git'))
-    config_file = os.path.join(git_path, 'config')
-    with open(config_file, 'a') as f:
-        f.write('[filter "substitution"]\n')
-        f.write('    smudge = matador substitute-keywords\n')
-        f.write('    clean = matador clean-keywords\n')
-        f.close()
-
     attributes_file = os.path.join(git_path, 'info', 'attributes')
     with open(attributes_file, 'a') as f:
         f.write('src/** filter=substitution\n')
