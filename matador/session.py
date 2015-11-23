@@ -85,7 +85,7 @@ class Session(object):
         if self.environment is not None:
             return
         else:
-            self.environment = environment
+            self.environment = self.environments[environment]
             self.matador_environment_folder = os.path.join(
                 self.matador_project_folder, environment)
             self.matador_tickets_folder = os.path.join(

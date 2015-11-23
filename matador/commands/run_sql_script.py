@@ -3,6 +3,7 @@ import os
 import subprocess
 from string import Template
 from .command import Command
+from matador.session import Session
 
 
 def _connection_string(dbms, connection, user, password):
@@ -20,11 +21,6 @@ def _sql_script(file_path):
 class RunSqlScript(Command):
 
     def _add_arguments(self, parser):
-        parser.add_argument(
-            '-s', '--dbms',
-            type=str,
-            required=True,
-            help='oracle or mssql')
 
         parser.add_argument(
             '-d', '--directory',
@@ -39,10 +35,10 @@ class RunSqlScript(Command):
             help='Script file name')
 
         parser.add_argument(
-            '-c', '--connection',
+            '-e', '--environment',
             type=str,
             required=True,
-            help='db connection string')
+            help='Agresso environment')
 
         parser.add_argument(
             '-u', '--user',
@@ -77,11 +73,14 @@ class RunSqlScript(Command):
             'Matador: Executing ${file} against ${connection} \n')
         substitutions = {
             'file': os.path.basename(file_path),
-            'connection': self.args.connection
+            'connection': Session.environment['connection']
         }
         self._logger.info(message.substitute(substitutions))
 
         connection_string = _connection_string(
-            self.args.dbms,
-            self.args.connection, self.args.user, self.args.password)
-        self._runScript(file_path, self.args.dbms, connection_string)
+            Session.environment['dbms'],
+            Session.environment['connection'],
+            self.args.user,
+            self.args.password)
+        self._runScript(
+            file_path, Session.environment['dbms'], connection_string)
