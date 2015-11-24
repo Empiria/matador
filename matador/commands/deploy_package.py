@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from .command import Command
-from .deploy_package import execute_ticket
+from .deploy_ticket import execute_ticket
 from matador.session import Session
 import subprocess
 import os
@@ -66,8 +66,8 @@ class DeployPackage(ActionPackage):
             Session.matador_packages_folder, self.args.package)
         sourceFile = os.path.join(package_folder, 'tickets.py')
         try:
-            SourceFileLoader('tickets', sourceFile).load_module()
-            for ticket in tickets:
+            mod = SourceFileLoader('tickets', sourceFile).load_module()
+            for ticket in mod.tickets:
                 execute_ticket(ticket, 'deploy', self.args.commit, True)
         finally:
             shutil.rmtree(package_folder)
