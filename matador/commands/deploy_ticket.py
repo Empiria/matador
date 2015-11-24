@@ -6,6 +6,47 @@ import subprocess
 import os
 import shutil
 
+def _checkout_ticket(ticket, repo_folder, ticket_folder, commit):
+
+    subprocess.run([
+        'git', '-C', repo_folder, 'checkout', commit],
+        stderr=subprocess.STDOUT,
+        stdout=open(os.devnull, 'w'),
+        check=True)
+
+    src = os.path.join(repo_folder, 'deploy', 'tickets', ticket)
+    shutil.copytree(src, ticket_folder)
+
+
+def _cleanup(ticket_folder):
+    shutil.rmtree(ticket_folder)
+
+
+def execute_ticket(ticket, action, commit, packaged=False):
+    proj_folder = Session.project_folder
+    repo_folder = Session.matador_repository_folder
+    ticket_folder = os.path.join(
+        Session.matador_tickets_folder, ticket)
+    Session.ticket_folder = ticket_folder
+
+    if not packaged:
+        Session.update_repository()
+
+    if commit == 'none':
+        commit = subprocess.check_output(
+            ['git', '-C', proj_folder, 'rev-parse', 'HEAD'],
+            stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
+
+    _checkout_ticket(ticket, repo_folder, ticket_folder, commit)
+
+    actionFile = action + '.py'
+    sourceFile = os.path.join(ticket_folder, actionFile)
+    try:
+        from importlib.machinery import SourceFileLoader
+        SourceFileLoader(action, sourceFile).load_module()
+    finally:
+        _cleanup(ticket_folder)
+
 
 class ActionTicket(Command):
     action = 'None'
@@ -36,49 +77,9 @@ class ActionTicket(Command):
             default=False,
             help='Whether this deployment is part of a package')
 
-    def _checkout_ticket(self, repo_folder, ticket_folder, commit):
-
-        subprocess.run([
-            'git', '-C', repo_folder, 'checkout', commit],
-            stderr=subprocess.STDOUT,
-            stdout=open(os.devnull, 'w'),
-            check=True)
-
-        src = os.path.join(repo_folder, 'deploy', 'tickets', self.args.ticket)
-        shutil.copytree(src, ticket_folder)
-
-    def _cleanup(self, ticket_folder):
-        shutil.rmtree(ticket_folder)
-
     def _execute(self):
         Session.set_environment(self.args.environment)
-        proj_folder = Session.project_folder
-        repo_folder = Session.matador_repository_folder
-        ticket_folder = os.path.join(
-            Session.matador_tickets_folder, self.args.ticket)
-        Session.ticket_folder = ticket_folder
-
-        if not self.args.packaged:
-            Session.update_repository()
-
-        if self.args.commit == 'none':
-            commit = subprocess.check_output(
-                ['git', '-C', proj_folder, 'rev-parse', 'HEAD'],
-                stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
-        else:
-            commit = self.args['commit']
-
-        self._logger.debug(commit)
-
-        self._checkout_ticket(repo_folder, ticket_folder, commit)
-
-        actionFile = self.action + '.py'
-        sourceFile = os.path.join(ticket_folder, actionFile)
-        try:
-            from importlib.machinery import SourceFileLoader
-            SourceFileLoader(self.action, sourceFile).load_module()
-        finally:
-            self._cleanup(ticket_folder)
+        execute_ticket(self.args.ticket, self.action, self.args.commit, False)
 
 
 class DeployTicket(ActionTicket):
