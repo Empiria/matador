@@ -91,9 +91,12 @@ class Session(object):
                 self.matador_project_folder, environment)
             self.matador_tickets_folder = os.path.join(
                 self.matador_environment_folder, 'tickets')
+            self.matador_packages_folder = os.path.join(
+                self.matador_environment_folder, 'packages')
 
             os.makedirs(self.matador_environment_folder, exist_ok=True)
             os.makedirs(self.matador_tickets_folder, exist_ok=True)
+            os.makedirs(self.matador_packages_folder, exist_ok=True)
 
     @classmethod
     def update_repository(self):
