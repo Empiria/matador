@@ -84,5 +84,6 @@ class ActionTicket(Command):
 class DeployTicket(ActionTicket):
     action = 'deploy'
 
+
 class RemoveTicket(ActionTicket):
     action = 'remove'
