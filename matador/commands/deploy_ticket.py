@@ -19,10 +19,6 @@ def _checkout_ticket(ticket, repo_folder, ticket_folder, commit):
     shutil.copytree(src, ticket_folder)
 
 
-def _cleanup(ticket_folder):
-    shutil.rmtree(ticket_folder)
-
-
 def execute_ticket(ticket, action, commit, packaged=False):
     proj_folder = Session.project_folder
     repo_folder = Session.matador_repository_folder
@@ -46,7 +42,7 @@ def execute_ticket(ticket, action, commit, packaged=False):
         from importlib.machinery import SourceFileLoader
         SourceFileLoader(action, sourceFile).load_module()
     finally:
-        _cleanup(ticket_folder)
+        shutil.rmtree(ticket_folder)
 
 
 class ActionTicket(Command):
