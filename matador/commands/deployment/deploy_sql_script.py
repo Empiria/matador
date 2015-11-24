@@ -62,4 +62,3 @@ class DeployOraclePackage(DeploymentCommand):
 
         run_sql_script(self._logger, packageSpecScript)
         run_sql_script(self._logger, packageBodyScript)
-
