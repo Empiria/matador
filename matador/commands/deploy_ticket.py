@@ -7,7 +7,8 @@ import os
 import shutil
 
 
-class DeployTicket(Command):
+class ActionTicket(Command):
+    action = None
 
     def _add_arguments(self, parser):
         parser.prog = 'matador deploy-ticket'
@@ -74,6 +75,13 @@ class DeployTicket(Command):
         deploy_file = os.path.join(ticket_folder, 'deploy.py')
         try:
             from importlib.machinery import SourceFileLoader
-            SourceFileLoader('deploy', deploy_file).load_module()
+            SourceFileLoader(self.action, deploy_file).load_module()
         finally:
             self._cleanup(ticket_folder)
+
+
+class DeployTicket(ActionTicket):
+    action = 'deploy'
+
+class RemoveTicket(ActionTicket):
+    action = 'remove'
