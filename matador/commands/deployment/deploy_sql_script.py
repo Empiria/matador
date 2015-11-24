@@ -10,7 +10,7 @@ def _checkout_script(path, commit):
     repo_folder = Session.matador_repository_folder
     scriptPath = os.path.join(repo_folder, path)
     targetScript = os.path.join(
-        Session.ticket_folder, os.path.basename(scriptPath))
+        Session.deployment_folder, os.path.basename(scriptPath))
 
     subprocess.run(
         ['git', '-C', repo_folder, 'checkout', commit],
@@ -37,7 +37,7 @@ class DeploySqlScript(DeploymentCommand):
         path = self.args[0]
 
         if len(os.path.dirname(path)) == 0:
-            targetScript = os.path.join(Session.ticket_folder, path)
+            targetScript = os.path.join(Session.deployment_folder, path)
         else:
             commit = self.args[1]
             targetScript = _checkout_script(path, commit)

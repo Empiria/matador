@@ -64,6 +64,7 @@ class DeployPackage(ActionPackage):
         super(DeployPackage, self)._execute()
         package_folder = os.path.join(
             Session.matador_packages_folder, self.args.package)
+        Session.deployment_folder = package_folder
         sourceFile = os.path.join(package_folder, 'tickets.py')
         try:
             mod = SourceFileLoader('tickets', sourceFile).load_module()
@@ -76,9 +77,10 @@ class DeployPackage(ActionPackage):
 class RemovePackage(ActionPackage):
 
     def _execute(self):
-        super(DeployPackage, self)._execute()
+        super(RemovePackage, self)._execute()
         package_folder = os.path.join(
             Session.matador_packages_folder, self.args.package)
+        Session.deployment_folder = package_folder
         sourceFile = os.path.join(package_folder, 'remove.py')
         try:
             SourceFileLoader('remove', sourceFile).load_module()

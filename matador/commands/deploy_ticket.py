@@ -25,7 +25,7 @@ def execute_ticket(ticket, action, commit, packaged=False):
     repo_folder = Session.matador_repository_folder
     ticket_folder = os.path.join(
         Session.matador_tickets_folder, ticket)
-    Session.ticket_folder = ticket_folder
+    Session.deployment_folder = ticket_folder
 
     if not packaged:
         Session.update_repository()
