@@ -8,7 +8,7 @@ import shutil
 
 
 class ActionTicket(Command):
-    action = None
+    action = 'None'
 
     def _add_arguments(self, parser):
         parser.prog = 'matador deploy-ticket'
@@ -72,10 +72,11 @@ class ActionTicket(Command):
 
         self._checkout_ticket(repo_folder, ticket_folder, commit)
 
-        deploy_file = os.path.join(ticket_folder, 'deploy.py')
+        actionFile = self.action + '.py'
+        sourceFile = os.path.join(ticket_folder, actionFile)
         try:
             from importlib.machinery import SourceFileLoader
-            SourceFileLoader(self.action, deploy_file).load_module()
+            SourceFileLoader(self.action, sourceFile).load_module()
         finally:
             self._cleanup(ticket_folder)
 
