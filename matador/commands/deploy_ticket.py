@@ -5,6 +5,7 @@ from matador.session import Session
 import subprocess
 import os
 import shutil
+from importlib.machinery import SourceFileLoader
 
 
 def _checkout_ticket(ticket, repo_folder, ticket_folder, commit):
@@ -39,7 +40,6 @@ def execute_ticket(ticket, action, commit, packaged=False):
     actionFile = action + '.py'
     sourceFile = os.path.join(ticket_folder, actionFile)
     try:
-        from importlib.machinery import SourceFileLoader
         SourceFileLoader(action, sourceFile).load_module()
     finally:
         shutil.rmtree(ticket_folder)
