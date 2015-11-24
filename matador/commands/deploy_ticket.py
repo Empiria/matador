@@ -66,7 +66,7 @@ class ActionTicket(Command):
             '-c', '--commit',
             type=str,
             default='none',
-            help='Branch name')
+            help='Commit or tag ID')
 
         parser.add_argument(
             '-p', '--packaged',
