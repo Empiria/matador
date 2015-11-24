@@ -6,6 +6,7 @@ import subprocess
 import os
 import shutil
 
+
 def _checkout_ticket(ticket, repo_folder, ticket_folder, commit):
 
     subprocess.run([
