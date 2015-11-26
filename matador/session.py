@@ -46,24 +46,30 @@ def initialise_repository(proj_folder, repo_folder):
 
 class Session(object):
 
+    project_folder = None
     environment = None
 
     @classmethod
-    def _initialise_session(self):
-        self.project_folder = subprocess.check_output(
-            ['git', 'rev-parse', '--show-toplevel'],
-            stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
+    def initialise_session(self):
+        if self.project_folder is not None:
+            return
+        else:
+            self.project_folder = subprocess.check_output(
+                ['git', 'rev-parse', '--show-toplevel'],
+                stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
 
-        self.project = os.path.basename(self.project_folder)
+            self.project = os.path.basename(self.project_folder)
 
-        self.matador_project_folder = os.path.expanduser(
-            '~/.matador/%s' % self.project)
+            self.matador_project_folder = os.path.expanduser(
+                '~/.matador/%s' % self.project)
 
-        self.matador_repository_folder = os.path.join(
-            self.matador_project_folder, 'repository')
+            self.matador_repository_folder = os.path.join(
+                self.matador_project_folder, 'repository')
 
-        self.environments = get_environments(self.project_folder)
+            self.environments = get_environments(self.project_folder)
 
+    @classmethod
+    def _initialise_matador_repository(self):
         os.makedirs(self.matador_project_folder, exist_ok=True)
         os.makedirs(self.matador_repository_folder, exist_ok=True)
 
@@ -79,10 +85,11 @@ class Session(object):
 
     @classmethod
     def set_environment(self, environment):
+        self.initialise_session()
         if self.environment is not None:
             return
         else:
-            self._initialise_session()
+            self._initialise_matador_repository()
             self.environment = self.environments[environment]
             credentials = get_credentials(self.project_folder)
             self.credentials = credentials[environment]
