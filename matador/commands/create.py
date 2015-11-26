@@ -16,7 +16,6 @@ class CreateTicket(Command):
             help='Ticket name')
 
     def _execute(self):
-        Session.initialise_session()
         ticket_folder = os.path.join(
             Session.project_folder, 'deploy', 'tickets', self.args.ticket)
         os.makedirs(ticket_folder)
@@ -38,7 +37,6 @@ class CreatePackage(Command):
             help='Ticket name')
 
     def _execute(self):
-        Session.initialise_session()
         package_folder = os.path.join(
             Session.project_folder, 'deploy', 'packages', self.args.package)
         os.makedirs(package_folder)

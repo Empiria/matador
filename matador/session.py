@@ -85,7 +85,6 @@ class Session(object):
 
     @classmethod
     def set_environment(self, environment):
-        self.initialise_session()
         if self.environment is not None:
             return
         else:
