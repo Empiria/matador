@@ -1,7 +1,7 @@
 from .run_sql_script import RunSqlScript
 from .deploy_ticket import DeployTicket, RemoveTicket
 from .deploy_package import DeployPackage, RemovePackage
-from .create_ticket import CreateTicket
+from .create import CreateTicket, CreatePackage
 
 commands = {
     'run-sql-script': RunSqlScript,
@@ -9,5 +9,6 @@ commands = {
     'remove-ticket': RemoveTicket,
     'deploy-package': DeployPackage,
     'remove-package': RemovePackage,
-    'create-ticket': CreateTicket
+    'create-ticket': CreateTicket,
+    'create-package': CreatePackage,
 }
