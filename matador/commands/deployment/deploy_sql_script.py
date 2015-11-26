@@ -53,7 +53,8 @@ class DeployOraclePackage(DeploymentCommand):
 
         repo_folder = Session.matador_repository_folder
         package = os.path.join(
-            repo_folder, 'src', 'packages', packageName, packageName)
+            repo_folder, 'src', 'db_objects', 'packages', packageName,
+            packageName)
         packageSpec = package + '.pks'
         packageBody = package + '.pkb'
 
