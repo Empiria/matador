@@ -27,6 +27,8 @@ def execute_ticket(ticket, action, commit, packaged=False):
         Session.matador_tickets_folder, ticket)
     Session.deployment_folder = ticket_folder
 
+    shutil.rmtree(ticket_folder, ignore_errors=True)
+
     if not packaged:
         Session.update_repository()
 
@@ -39,10 +41,7 @@ def execute_ticket(ticket, action, commit, packaged=False):
 
     actionFile = action + '.py'
     sourceFile = os.path.join(ticket_folder, actionFile)
-    try:
-        SourceFileLoader(action, sourceFile).load_module()
-    finally:
-        shutil.rmtree(ticket_folder)
+    SourceFileLoader(action, sourceFile).load_module()
 
 
 class ActionTicket(Command):
