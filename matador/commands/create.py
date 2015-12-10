@@ -41,9 +41,12 @@ class CreatePackage(Command):
             Session.project_folder, 'deploy', 'packages', self.args.package)
         os.makedirs(package_folder)
 
-        package_file = os.path.join(package_folder, 'tickets.py')
+        package_file = os.path.join(package_folder, 'tickets.yml')
         with open(package_file, 'w') as f:
-            f.write('tickets = []')
+            f.write(
+                '# List each ticket on a separate line preceded by - . e.g.\n')
+            f.write('# - 30\n')
+            f.write('# - 31\n')
             f.close()
 
         remove_file = os.path.join(package_folder, 'remove.py')

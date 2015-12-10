@@ -5,6 +5,7 @@ from matador.session import Session
 import subprocess
 import os
 import shutil
+import yaml
 from importlib.machinery import SourceFileLoader
 
 
@@ -65,11 +66,11 @@ class DeployPackage(ActionPackage):
         package_folder = os.path.join(
             Session.matador_packages_folder, self.args.package)
         Session.deployment_folder = package_folder
-        sourceFile = os.path.join(package_folder, 'tickets.py')
+        ticketsFile = os.path.join(package_folder, 'tickets.yml')
         try:
-            mod = SourceFileLoader('tickets', sourceFile).load_module()
-            for ticket in mod.tickets:
-                execute_ticket(ticket, 'deploy', self.args.commit, True)
+            tickets = yaml.load(open(ticketsFile, 'r'))
+            for ticket in tickets:
+                execute_ticket(str(ticket), 'deploy', self.args.commit, True)
         finally:
             shutil.rmtree(package_folder)
 
