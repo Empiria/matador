@@ -38,6 +38,8 @@ class ActionPackage(Command):
         package_folder = os.path.join(
             Session.matador_packages_folder, package)
 
+        shutil.rmtree(package_folder, ignore_errors=True)
+
         Session.update_repository()
 
         if commit == 'none':
@@ -67,12 +69,11 @@ class DeployPackage(ActionPackage):
             Session.matador_packages_folder, self.args.package)
         Session.deployment_folder = package_folder
         ticketsFile = os.path.join(package_folder, 'tickets.yml')
-        try:
-            tickets = yaml.load(open(ticketsFile, 'r'))
-            for ticket in tickets:
-                execute_ticket(str(ticket), 'deploy', self.args.commit, True)
-        finally:
-            shutil.rmtree(package_folder)
+
+        tickets = yaml.load(open(ticketsFile, 'r'))
+        for ticket in tickets:
+            execute_ticket(str(ticket), 'deploy', self.args.commit, True)
+
 
 
 class RemovePackage(ActionPackage):
@@ -83,7 +84,5 @@ class RemovePackage(ActionPackage):
             Session.matador_packages_folder, self.args.package)
         Session.deployment_folder = package_folder
         sourceFile = os.path.join(package_folder, 'remove.py')
-        try:
-            SourceFileLoader('remove', sourceFile).load_module()
-        finally:
-            shutil.rmtree(package_folder)
+
+        SourceFileLoader('remove', sourceFile).load_module()
