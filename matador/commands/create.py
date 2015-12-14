@@ -98,7 +98,7 @@ class AddTicketToPackage(Command):
             'tickets.yml')
 
         with open(package_file, 'a') as f:
-            f.write('- %s' % self.args.ticket)
+            f.write('- %s\n' % self.args.ticket)
             f.close()
 
         add_to_git(
