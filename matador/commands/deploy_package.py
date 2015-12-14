@@ -72,6 +72,9 @@ class DeployPackage(ActionPackage):
 
         tickets = yaml.load(open(ticketsFile, 'r'))
         for ticket in tickets:
+            self._logger.info('*' * 25)
+            self._logger.info('Deploying ticket %s' % ticket)
+            self._logger.info('*' * 25)
             execute_ticket(str(ticket), 'deploy', self.args.commit, True)
 
 
