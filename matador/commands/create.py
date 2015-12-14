@@ -73,3 +73,37 @@ class CreatePackage(Command):
 
         add_to_git(
             Session.project_folder, 'Create package %s' % self.args.package)
+
+
+class AddTicketToPackage(Command):
+
+    def _add_arguments(self, parser):
+        parser.prog = 'matador add-t2p'
+
+        parser.add_argument(
+            '-t', '--ticket',
+            type=str,
+            required=True,
+            help='Ticket name')
+
+        parser.add_argument(
+            '-p', '--package',
+            type=str,
+            required=True,
+            help='Ticket name')
+
+    def _execute(self):
+        package_file = os.path.join(
+            Session.project_folder, 'deploy', 'packages', self.args.package,
+            'tickets.yml')
+
+        with open(package_file, 'a') as f:
+            f.write('- %s' % self.args.ticket)
+            f.close()
+
+        add_to_git(
+            Session.project_folder,
+            'Add ticket %s to package %s' % (
+                self.args.ticket, self.args.package))
+
+
