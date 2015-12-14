@@ -2,6 +2,19 @@
 from .command import Command
 from matador.session import Session
 import os
+import subprocess
+
+
+def add_to_git(directory, message):
+    subprocess.run([
+        'git', '-C', directory, 'add', '-A'],
+        stderr=subprocess.STDOUT,
+        stdout=open(os.devnull, 'w'))
+
+    subprocess.run([
+        'git', '-C', directory, 'commit', '-m', message],
+        stderr=subprocess.STDOUT,
+        stdout=open(os.devnull, 'w'))
 
 
 class CreateTicket(Command):
@@ -20,9 +33,13 @@ class CreateTicket(Command):
             Session.project_folder, 'deploy', 'tickets', self.args.ticket)
         os.makedirs(ticket_folder)
         deploy_file = os.path.join(ticket_folder, 'deploy.py')
+
         with open(deploy_file, 'w') as f:
             f.write('from matador.commands.deployment import *\n\n')
             f.close()
+
+        add_to_git(
+            Session.project_folder, 'Create ticket %s' % self.args.ticket)
 
 
 class CreatePackage(Command):
@@ -53,3 +70,6 @@ class CreatePackage(Command):
         with open(remove_file, 'w') as f:
             f.write('from matador.commands.deployment import *\n\n')
             f.close()
+
+        add_to_git(
+            Session.project_folder, 'Create package %s' % self.args.package)
