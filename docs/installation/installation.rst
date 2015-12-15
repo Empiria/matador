@@ -14,8 +14,8 @@ install Matador itself:
     Download and install the current version of Python 3 (e.g. Python 3.5.1) for
     your operating system from https://www.python.org/downloads/
 
-Installation
-============
+Installing Matador
+==================
 
 Your Python installation should include the Python Package Manager, Pip, which
 can now be used to install Matador. From a command line, type::
