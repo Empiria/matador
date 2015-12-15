@@ -55,3 +55,19 @@ and you should see::
                             logging (none, console or file)
       -v VERBOSITY, --verbosity VERBOSITY
                             Logging level. DEBUG, INFO, ERROR or CRITICAL
+
+A Matador Project
+=================
+
+Most Matador commands will only execute successfully from within a valid project
+folder.
+
+If you are working on an existing project, simply clone its repository
+to a directory of your choice and change into that directory.
+
+e.g. on Windows, to create a folder for a project named 'toreador' within an
+existing 'c:\\projects' folder::
+
+  cd c:\projects
+  git clone <url for the toreador project>
+  cd toreador
