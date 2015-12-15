@@ -12,7 +12,11 @@ install Matador itself:
 #.  Python
 
     Download and install the current version of Python 3 (e.g. Python 3.5.1) for
-    your operating system from https://www.python.org/downloads/
+    your operating system.
+
+    There have been some problems on Windows machines using Matador with the
+    Python distribution from python.org. Instead, you may wish to use the
+    Anaconda distribution from https://www.continuum.io/downloads
 
 Installing Matador
 ==================
