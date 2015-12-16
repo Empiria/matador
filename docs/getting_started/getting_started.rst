@@ -9,14 +9,11 @@ install Matador itself:
     Download and install the current version for your operating system from
     https://git-scm.com/download
 
-#.  Python
+#.  The Anaconda Python Distribution
 
-    Download and install the current version of Python 3 (e.g. Python 3.5.1) for
-    your operating system.
+    Download and install the current version of Anaconda for Python 3 (e.g. 3.5)
+    from https://www.continuum.io/downloads
 
-    There have been some problems on Windows machines using Matador with the
-    Python distribution from python.org. Instead, you may wish to use the
-    Anaconda distribution from https://www.continuum.io/downloads
 
 Installing Matador
 ==================
