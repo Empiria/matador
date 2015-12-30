@@ -4,24 +4,25 @@ import subprocess
 import yaml
 from dulwich import porcelain
 from configparser import ConfigParser
+from pathlib import PurePath, Path
 
 
 def get_environments(project_folder):
-        file_path = os.path.join(
+        file_path = PurePath(
             project_folder, 'config', 'environments.yml')
         file = open(file_path, 'r')
         return yaml.load(file)
 
 
 def get_credentials(project_folder):
-    file_path = os.path.join(
+    file_path = PurePath(
         project_folder, 'config', 'credentials.yml')
     file = open(file_path, 'r')
     return yaml.load(file)
 
 
 def initialise_repository(proj_folder, repo_folder):
-    config_file = (os.path.join(repo_folder, '.git', 'config'))
+    config_file = (PurePath(repo_folder, '.git', 'config'))
     config = ConfigParser()
 
     porcelain.init(repo_folder)
@@ -37,7 +38,7 @@ def initialise_repository(proj_folder, repo_folder):
         f.write(config)
         f.close()
 
-    sparse_checkout_file = os.path.join(
+    sparse_checkout_file = PurePath(
         repo_folder, '.git', 'info', 'sparse-checkout')
     with open(sparse_checkout_file, 'a') as f:
         f.write('/src\n')
@@ -59,12 +60,12 @@ class Session(object):
                 ['git', 'rev-parse', '--show-toplevel'],
                 stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
 
-            self.project = os.path.basename(self.project_folder)
+            self.project = Path(self.project_folder).parents[0]
 
-            self.matador_project_folder = os.path.expanduser(
-                '~/.matador/%s' % self.project)
+            self.matador_project_folder = PurePath(
+                Path.home(), '.matador', self.project)
 
-            self.matador_repository_folder = os.path.join(
+            self.matador_repository_folder = PurePath(
                 self.matador_project_folder, 'repository')
 
             self.environments = get_environments(self.project_folder)
@@ -95,16 +96,19 @@ class Session(object):
             credentials = get_credentials(self.project_folder)
             self.credentials = credentials[environment]
 
-            self.matador_environment_folder = os.path.join(
+            self.matador_environment_folder = PurePath(
                 self.matador_project_folder, environment)
-            self.matador_tickets_folder = os.path.join(
+            self.matador_tickets_folder = PurePath(
                 self.matador_environment_folder, 'tickets')
-            self.matador_packages_folder = os.path.join(
+            self.matador_packages_folder = PurePath(
                 self.matador_environment_folder, 'packages')
 
-            os.makedirs(self.matador_environment_folder, exist_ok=True)
-            os.makedirs(self.matador_tickets_folder, exist_ok=True)
-            os.makedirs(self.matador_packages_folder, exist_ok=True)
+            Path.mkdir(
+                self.matador_environment_folder, parents=True, exist_ok=True)
+            Path.mkdir(
+                self.matador_tickets_folder, parents=True, exist_ok=True)
+            Path.mkdir(
+                self.matador_packages_folder, parents=True, exist_ok=True)
 
     @classmethod
     def update_repository(self):
