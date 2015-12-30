@@ -2,6 +2,8 @@
 import os
 import subprocess
 import yaml
+from dulwich import porcelain
+from configparser import ConfigParser
 
 
 def get_environments(project_folder):
@@ -19,25 +21,24 @@ def get_credentials(project_folder):
 
 
 def initialise_repository(proj_folder, repo_folder):
-    subprocess.run([
-        'git', '-C', repo_folder, 'init'],
-        stderr=subprocess.STDOUT,
-        stdout=open(os.devnull, 'w'))
+    config_file = (os.path.join(repo_folder, '.git', 'config'))
+    config = ConfigParser()
 
-    subprocess.run([
-        'git', '-C', repo_folder, 'config', 'core.sparsecheckout', 'true'],
-        stderr=subprocess.STDOUT,
-        stdout=open(os.devnull, 'w'))
+    porcelain.init(repo_folder)
+    config.read(config_file)
 
-    subprocess.run([
-        'git', '-C', repo_folder, 'remote', 'add', 'origin', proj_folder],
-        stderr=subprocess.STDOUT,
-        stdout=open(os.devnull, 'w'))
+    config['core']['sparsecheckout'] = 'true'
+    config['remote "origin"'] = {
+        'url': proj_folder,
+        'fetch': '+refs/heads/*:refs/remotes/origin/*'
+    }
 
-    git_path = (os.path.join(repo_folder, '.git'))
+    with open(config_file, 'w') as f:
+        f.write(config)
+        f.close()
 
     sparse_checkout_file = os.path.join(
-        git_path, 'info', 'sparse-checkout')
+        repo_folder, '.git', 'info', 'sparse-checkout')
     with open(sparse_checkout_file, 'a') as f:
         f.write('/src\n')
         f.write('/deploy\n')
