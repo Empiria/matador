@@ -47,6 +47,10 @@ def initialise_repository(proj_folder, repo_folder):
         f.close()
 
 
+def project_folder():
+    return Path(Repo.discover().index_path()).parents[1]
+
+
 class Session(object):
 
     project_folder = None
@@ -57,12 +61,9 @@ class Session(object):
         if self.project_folder is not None:
             return
         else:
-            self.project_folder = Path(Repo.discover().index_path()).parents[1]
-            self.project_folder = subprocess.check_output(
-                ['git', 'rev-parse', '--show-toplevel'],
-                stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
+            self.project_folder = project_folder()
 
-            self.project = Path(self.project_folder).name()
+            self.project = self.project_folder.name
 
             self.matador_project_folder = Path(
                 Path.home(), '.matador', self.project)
