@@ -1,31 +1,32 @@
 #!/usr/bin/env python
-import os
+from os import devnull
 import subprocess
 import yaml
 from dulwich import porcelain
+from dulwich.repo import Repo
 from configparser import ConfigParser
-from pathlib import PurePath, Path
+from pathlib import Path
 
 
 def get_environments(project_folder):
-        file_path = PurePath(
+        file_path = Path(
             project_folder, 'config', 'environments.yml')
-        file = open(file_path, 'r')
+        file = file_path.open('r')
         return yaml.load(file)
 
 
 def get_credentials(project_folder):
-    file_path = PurePath(
+    file_path = Path(
         project_folder, 'config', 'credentials.yml')
-    file = open(file_path, 'r')
+    file = file_path.open('r')
     return yaml.load(file)
 
 
 def initialise_repository(proj_folder, repo_folder):
-    config_file = (PurePath(repo_folder, '.git', 'config'))
+    config_file = Path(repo_folder, '.git', 'config')
     config = ConfigParser()
 
-    porcelain.init(repo_folder)
+    porcelain.init(str(repo_folder))
     config.read(config_file)
 
     config['core']['sparsecheckout'] = 'true'
@@ -38,9 +39,9 @@ def initialise_repository(proj_folder, repo_folder):
         f.write(config)
         f.close()
 
-    sparse_checkout_file = PurePath(
+    sparse_checkout_file = Path(
         repo_folder, '.git', 'info', 'sparse-checkout')
-    with open(sparse_checkout_file, 'a') as f:
+    with sparse_checkout_file.open('a') as f:
         f.write('/src\n')
         f.write('/deploy\n')
         f.close()
@@ -56,30 +57,33 @@ class Session(object):
         if self.project_folder is not None:
             return
         else:
+            self.project_folder = Path(Repo.discover().index_path()).parents[1]
             self.project_folder = subprocess.check_output(
                 ['git', 'rev-parse', '--show-toplevel'],
                 stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
 
-            self.project = Path(self.project_folder).parents[0]
+            self.project = Path(self.project_folder).name()
 
-            self.matador_project_folder = PurePath(
+            self.matador_project_folder = Path(
                 Path.home(), '.matador', self.project)
 
-            self.matador_repository_folder = PurePath(
+            self.matador_repository_folder = Path(
                 self.matador_project_folder, 'repository')
 
             self.environments = get_environments(self.project_folder)
 
     @classmethod
     def _initialise_matador_repository(self):
-        os.makedirs(self.matador_project_folder, exist_ok=True)
-        os.makedirs(self.matador_repository_folder, exist_ok=True)
+        Path.mkdir(
+            self.matador_project_folder, parents=True, exist_ok=True)
+        Path.mkdir(
+            self.matador_repository_folder, parents=True, exist_ok=True)
 
         try:
             subprocess.run(
-                ['git', '-C', self.matador_repository_folder, 'status'],
+                ['git', '-C', str(self.matador_repository_folder), 'status'],
                 stderr=subprocess.STDOUT,
-                stdout=open(os.devnull, 'w'),
+                stdout=open(devnull, 'w'),
                 check=True)
         except subprocess.CalledProcessError:
             initialise_repository(
@@ -96,11 +100,11 @@ class Session(object):
             credentials = get_credentials(self.project_folder)
             self.credentials = credentials[environment]
 
-            self.matador_environment_folder = PurePath(
+            self.matador_environment_folder = Path(
                 self.matador_project_folder, environment)
-            self.matador_tickets_folder = PurePath(
+            self.matador_tickets_folder = Path(
                 self.matador_environment_folder, 'tickets')
-            self.matador_packages_folder = PurePath(
+            self.matador_packages_folder = Path(
                 self.matador_environment_folder, 'packages')
 
             Path.mkdir(
@@ -118,7 +122,7 @@ class Session(object):
             subprocess.run(
                 ['git', '-C', repo_folder, 'status'],
                 stderr=subprocess.STDOUT,
-                stdout=open(os.devnull, 'w'),
+                stdout=open(devnull, 'w'),
                 check=True)
         except subprocess.CalledProcessError:
             proj_folder = self.project_folder
@@ -127,4 +131,4 @@ class Session(object):
         subprocess.run(
             ['git', '-C', repo_folder, 'fetch', '-a'],
             stderr=subprocess.STDOUT,
-            stdout=open(os.devnull, 'w'))
+            stdout=open(devnull, 'w'))
