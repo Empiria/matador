@@ -17,7 +17,7 @@ def get_environments(project_folder):
         project_folder, 'config', 'environments.yml')
     try:
         file = file_path.open('r')
-        environments =  yaml.load(file)
+        environments = yaml.load(file)
         if environments:
             return environments
         else:
@@ -49,7 +49,7 @@ def initialise_repository(proj_folder, repo_folder):
     config = ConfigParser()
 
     porcelain.init(str(repo_folder))
-    config.read_text(config_file)
+    config.read(str(config_file))
 
     config['core']['sparsecheckout'] = 'true'
     config['remote "origin"'] = {
@@ -57,8 +57,8 @@ def initialise_repository(proj_folder, repo_folder):
         'fetch': '+refs/heads/*:refs/remotes/origin/*'
     }
 
-    with open(config_file, 'w') as f:
-        f.write(config)
+    with config_file.open('w') as f:
+        config.write(f)
         f.close()
 
     sparse_checkout_file = Path(
@@ -138,14 +138,9 @@ class Session(object):
         repo_folder = self.matador_repository_folder
 
         try:
-            subprocess.run(
-                ['git', '-C', str(repo_folder), 'status'],
-                stderr=subprocess.STDOUT,
-                stdout=open(devnull, 'w'),
-                check=True)
-        except subprocess.CalledProcessError:
-            proj_folder = self.project_folder
-            initialise_repository(proj_folder, repo_folder)
+            Repo(str(self.matador_repository_folder))
+        except NotGitRepository:
+            self._initialise_matador_repository()
 
         subprocess.run(
             ['git', '-C', str(repo_folder), 'fetch', '-a'],
