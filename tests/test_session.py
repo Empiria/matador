@@ -51,9 +51,11 @@ def project_repo(tmpdir, request):
         f.write_text(yaml.dump(credentials))
 
     repo.stage([
-        bytes(str(envs_file), encoding='UTF-8'),
-        bytes(str(creds_file), encoding='UTF-8')
+        bytes(str(envs_file.relative_to(repo_folder)), encoding='UTF-8'),
+        bytes(str(creds_file.relative_to(repo_folder)), encoding='UTF-8')
     ])
+
+    repo.do_commit(message=b'Create config files')
 
     return repo_folder
 
@@ -95,3 +97,4 @@ def test_set_environment(project_repo):
 def test_update_repository():
     Session.update_repository()
     refs = LocalGitClient().get_refs(str(Session.matador_repository_folder))
+    assert b'refs/remotes/origin/master' in refs
