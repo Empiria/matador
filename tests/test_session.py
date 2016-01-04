@@ -1,9 +1,7 @@
 from matador.session import Session
 from dulwich.repo import Repo
 from dulwich.client import LocalGitClient
-from dulwich.objects import Blob, Tree, Commit, parse_timezone
 from dulwich.errors import NotGitRepository
-from time import time
 from pathlib import Path
 import shutil
 from os import chdir
