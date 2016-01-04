@@ -17,9 +17,15 @@ def get_environments(project_folder):
         project_folder, 'config', 'environments.yml')
     try:
         file = file_path.open('r')
-        return yaml.load(file)
+        environments =  yaml.load(file)
+        if environments:
+            return environments
+        else:
+            raise ValueError()
     except FileNotFoundError:
         logger.error('Cannot find environments.yml file')
+    except ValueError:
+        logger.error('environments.yml exists but is empty')
 
 
 def get_credentials(project_folder):
@@ -27,9 +33,15 @@ def get_credentials(project_folder):
         project_folder, 'config', 'credentials.yml')
     try:
         file = file_path.open('r')
-        return yaml.load(file)
+        credentials = yaml.load(file)
+        if credentials:
+            return credentials
+        else:
+            raise ValueError()
     except FileNotFoundError:
         logger.error('Cannot find credentials.yml file')
+    except ValueError:
+        logger.error('credentials.yml exists but is empty')
 
 
 def initialise_repository(proj_folder, repo_folder):
@@ -37,7 +49,7 @@ def initialise_repository(proj_folder, repo_folder):
     config = ConfigParser()
 
     porcelain.init(str(repo_folder))
-    config.read(config_file)
+    config.read_text(config_file)
 
     config['core']['sparsecheckout'] = 'true'
     config['remote "origin"'] = {
@@ -127,7 +139,7 @@ class Session(object):
 
         try:
             subprocess.run(
-                ['git', '-C', repo_folder, 'status'],
+                ['git', '-C', str(repo_folder), 'status'],
                 stderr=subprocess.STDOUT,
                 stdout=open(devnull, 'w'),
                 check=True)
@@ -136,6 +148,6 @@ class Session(object):
             initialise_repository(proj_folder, repo_folder)
 
         subprocess.run(
-            ['git', '-C', repo_folder, 'fetch', '-a'],
+            ['git', '-C', str(repo_folder), 'fetch', '-a'],
             stderr=subprocess.STDOUT,
             stdout=open(devnull, 'w'))
