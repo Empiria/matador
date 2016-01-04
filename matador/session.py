@@ -1,25 +1,35 @@
 #!/usr/bin/env python
 from os import devnull
+import logging
 import subprocess
 import yaml
 from dulwich import porcelain
 from dulwich.repo import Repo
+from dulwich.errors import NotGitRepository
 from configparser import ConfigParser
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
+
 
 def get_environments(project_folder):
-        file_path = Path(
-            project_folder, 'config', 'environments.yml')
+    file_path = Path(
+        project_folder, 'config', 'environments.yml')
+    try:
         file = file_path.open('r')
         return yaml.load(file)
+    except FileNotFoundError:
+        logger.error('Cannot find environments.yml file')
 
 
 def get_credentials(project_folder):
     file_path = Path(
         project_folder, 'config', 'credentials.yml')
-    file = file_path.open('r')
-    return yaml.load(file)
+    try:
+        file = file_path.open('r')
+        return yaml.load(file)
+    except FileNotFoundError:
+        logger.error('Cannot find credentials.yml file')
 
 
 def initialise_repository(proj_folder, repo_folder):
@@ -81,12 +91,8 @@ class Session(object):
             self.matador_repository_folder, parents=True, exist_ok=True)
 
         try:
-            subprocess.run(
-                ['git', '-C', str(self.matador_repository_folder), 'status'],
-                stderr=subprocess.STDOUT,
-                stdout=open(devnull, 'w'),
-                check=True)
-        except subprocess.CalledProcessError:
+            Repo(str(self.matador_repository_folder))
+        except NotGitRepository:
             initialise_repository(
                 self.project_folder, self.matador_repository_folder)
 
