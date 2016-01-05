@@ -144,4 +144,5 @@ class Session(object):
         refs = LocalGitClient().fetch(str(self.project_folder), repo)
 
         for key, value in refs.items():
+            key = key.replace(b'heads', b'remotes/origin')
             repo.refs[key] = value

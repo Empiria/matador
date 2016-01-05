@@ -92,7 +92,7 @@ def test_set_environment(project_repo):
     assert Session.matador_packages_folder.is_dir()
 
 
-def test_update_repository():
+def test_update_repository(project_repo):
     Session.update_repository()
     refs = LocalGitClient().get_refs(str(Session.matador_repository_folder))
-    assert b'refs/heads/master' in refs
+    assert b'refs/remotes/origin/master' in refs
