@@ -78,6 +78,7 @@ def project_folder():
 
 
 class Session(object):
+
     """A class to hold variables for a matador session."""
 
     project_folder = None
