@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_environments(project_folder):
+    """Fetch environment details from their config file."""
     file_path = Path(
         project_folder, 'config', 'environments.yml')
     try:
@@ -27,6 +28,7 @@ def get_environments(project_folder):
 
 
 def get_credentials(project_folder):
+    """Fetch credential details from their config file."""
     file_path = Path(
         project_folder, 'config', 'credentials.yml')
     try:
@@ -43,6 +45,7 @@ def get_credentials(project_folder):
 
 
 def initialise_repository(proj_folder, repo_folder):
+    """Create a git repository for matador to use."""
     config_file = Path(repo_folder, '.git', 'config')
     config = ConfigParser()
 
@@ -70,16 +73,19 @@ def initialise_repository(proj_folder, repo_folder):
 
 
 def project_folder():
+    """|Return the path to the project root directory."""
     return Path(Repo.discover().index_path()).parents[1]
 
 
 class Session(object):
+    """A class to hold variables for a matador session."""
 
     project_folder = None
     environment = None
 
     @classmethod
     def initialise_session(self):
+        """Set the project name and folders for its repositories."""
         if self.project_folder is not None:
             return
         else:
@@ -97,6 +103,7 @@ class Session(object):
 
     @classmethod
     def _initialise_matador_repository(self):
+        """Initialise a git repository for matador to use."""
         Path.mkdir(
             self.matador_project_folder, parents=True, exist_ok=True)
         Path.mkdir(
@@ -111,6 +118,7 @@ class Session(object):
 
     @classmethod
     def set_environment(self, environment):
+        """Set a specific environment for those commands which require it."""
 
         if self.environment is not None:
             return
@@ -136,6 +144,7 @@ class Session(object):
 
     @classmethod
     def update_repository(self):
+        """Fetch all from the project repo to the matador repo."""
         try:
             repo = Repo(str(self.matador_repository_folder))
         except NotGitRepository:
