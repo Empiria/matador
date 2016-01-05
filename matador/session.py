@@ -1,10 +1,8 @@
 #!/usr/bin/env python
-from os import devnull
 import logging
-import subprocess
 import yaml
-from dulwich import porcelain
 from dulwich.repo import Repo
+from dulwich.client import LocalGitClient
 from dulwich.errors import NotGitRepository
 from configparser import ConfigParser
 from pathlib import Path
@@ -48,7 +46,7 @@ def initialise_repository(proj_folder, repo_folder):
     config_file = Path(repo_folder, '.git', 'config')
     config = ConfigParser()
 
-    porcelain.init(str(repo_folder))
+    repo = Repo.init(str(repo_folder))
     config.read(str(config_file))
 
     config['core']['sparsecheckout'] = 'true'
@@ -67,6 +65,8 @@ def initialise_repository(proj_folder, repo_folder):
         f.write('/src\n')
         f.write('/deploy\n')
         f.close()
+
+    return repo
 
 
 def project_folder():
@@ -103,10 +103,11 @@ class Session(object):
             self.matador_repository_folder, parents=True, exist_ok=True)
 
         try:
-            Repo(str(self.matador_repository_folder))
+            repo = Repo(str(self.matador_repository_folder))
         except NotGitRepository:
-            initialise_repository(
+            repo = initialise_repository(
                 self.project_folder, self.matador_repository_folder)
+        return repo
 
     @classmethod
     def set_environment(self, environment):
@@ -135,14 +136,12 @@ class Session(object):
 
     @classmethod
     def update_repository(self):
-        repo_folder = self.matador_repository_folder
-
         try:
-            Repo(str(self.matador_repository_folder))
+            repo = Repo(str(self.matador_repository_folder))
         except NotGitRepository:
-            self._initialise_matador_repository()
+            repo = self._initialise_matador_repository()
 
-        subprocess.run(
-            ['git', '-C', str(repo_folder), 'fetch', '-a'],
-            stderr=subprocess.STDOUT,
-            stdout=open(devnull, 'w'))
+        refs = LocalGitClient().fetch(str(self.project_folder), repo)
+
+        for key, value in refs.items():
+            repo.refs[key] = value

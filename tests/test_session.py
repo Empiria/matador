@@ -95,4 +95,4 @@ def test_set_environment(project_repo):
 def test_update_repository():
     Session.update_repository()
     refs = LocalGitClient().get_refs(str(Session.matador_repository_folder))
-    assert b'refs/remotes/origin/master' in refs
+    assert b'refs/heads/master' in refs
