@@ -7,16 +7,7 @@ import shutil
 from os import chdir
 import pytest
 import yaml
-
-project = 'matador-test'
-
-environments = {
-    'test': {'dbms': 'oracle', 'connection': 'user@instance'}
-}
-
-credentials = {
-    'test': {'user': 'test_user', 'password': 'test_password'}
-}
+from globals import project, credentials, environments
 
 
 @pytest.fixture
