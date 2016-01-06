@@ -66,3 +66,21 @@ def test_create_package(project_repo):
     expected_message = bytes(
         'Create package %s\n' % test_package, encoding='UTF-8')
     assert commit_message == expected_message
+
+
+def test_add_ticket_to_package(project_repo):
+    test_ticket = 'test-ticket'
+    test_package = 'test-package'
+    package_folder = Path(
+        project_repo, 'deploy', 'packages', test_package)
+    Path.mkdir(package_folder, parents=True)
+    tickets_file = Path(package_folder, 'tickets.yml')
+    tickets_file.touch()
+
+    cmd.AddTicketToPackage(ticket=test_ticket, package=test_package)
+
+    with tickets_file.open('r') as f:
+        tickets = f.readlines()
+
+    assert '- %s\n' % test_ticket in tickets
+
