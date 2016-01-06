@@ -10,7 +10,11 @@ class Command(object):
         if kwargs:
             # If kwargs have been supplied, use these in same way argsparse
             # would.
-            # Mainly used for testing.
+            # Mainly used for testing, but could be used to run commands from
+            # within python scripts.
+
+            # We can't add attributes to instances of Object, so we need create
+            # a new class.
             class Args(object):
                 pass
 
