@@ -44,6 +44,7 @@ class CreateTicket(Command):
         stage_file(deploy_file)
         commit('Create ticket %s' % self.args.ticket)
 
+
 class CreatePackage(Command):
 
     def _add_arguments(self, parser):
