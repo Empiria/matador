@@ -83,4 +83,3 @@ def test_add_ticket_to_package(project_repo):
         tickets = f.readlines()
 
     assert '- %s\n' % test_ticket in tickets
-
