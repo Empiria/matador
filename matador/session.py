@@ -85,7 +85,7 @@ class Session(object):
     environment = None
 
     @classmethod
-    def initialise_session(self):
+    def initialise(self):
         """Set the project name and folders for its repositories."""
         if self.project_folder is not None:
             return
@@ -121,6 +121,9 @@ class Session(object):
     def set_environment(self, environment):
         """Set a specific environment for those commands which require it."""
 
+        if self.project_folder is None:
+            self.initialise()
+
         if self.environment is not None:
             return
         else:
@@ -146,6 +149,10 @@ class Session(object):
     @classmethod
     def update_repository(self):
         """Fetch all from the project repo to the matador repo."""
+
+        if self.project_folder is None:
+            self.initialise()
+
         try:
             repo = Repo(str(self.matador_repository_folder))
         except NotGitRepository:
@@ -156,3 +163,8 @@ class Session(object):
         for key, value in refs.items():
             key = key.replace(b'heads', b'remotes/origin')
             repo.refs[key] = value
+
+    @classmethod
+    def clear(self):
+        self.project_folder = None
+        self.environment = None

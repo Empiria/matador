@@ -5,11 +5,19 @@ from dulwich.errors import NotGitRepository
 from dulwich.repo import Repo
 import yaml
 from os import chdir
+from matador.session import Session
 from globals import project, credentials, environments
+
+@pytest.fixture
+def session(request):
+
+    def finalise():
+        Session.clear()
+    request.addfinalizer(finalise)
 
 
 @pytest.fixture
-def project_repo(tmpdir, request):
+def project_repo(tmpdir, request, session):
 
     def finalise():
         rmtree(
