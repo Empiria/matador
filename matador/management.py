@@ -28,6 +28,8 @@ def _setup_logging(logging_destination='console', verbosity='INFO'):
 
 
 def execute_command():
+    """Entry point for command line executable."""
+
     parser = argparse.ArgumentParser(
         description="Taming the bull: Change management for Agresso systems")
 
