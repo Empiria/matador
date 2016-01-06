@@ -8,8 +8,9 @@ class Command(object):
 
     def __init__(self, **kwargs):
         if kwargs:
-        # If kwargs have been supplied, use these in same way argsparse would.
-        # Mainly used for testing.
+            # If kwargs have been supplied, use these in same way argsparse
+            # would.
+            # Mainly used for testing.
             class Args(object):
                 pass
 
@@ -17,8 +18,8 @@ class Command(object):
             for key, value in kwargs.items():
                 setattr(self.args, key, value)
         else:
-        # If the command is created from the command line, we'll have arguments
-        # to parse.
+            # If the command is created from the command line, we'll have
+            # arguments to parse.
             parser = argparse.ArgumentParser(
                 description="Taming the bull: Change management for Agresso systems")
             self._add_arguments(parser)
