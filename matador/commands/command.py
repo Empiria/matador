@@ -6,12 +6,25 @@ from matador.session import Session
 
 class Command(object):
 
-    def __init__(self):
-        parser = argparse.ArgumentParser(
-            description="Taming the bull: Change management for Agresso systems")
+    def __init__(self, **kwargs):
+        if kwargs:
+        # If kwargs have been supplied, use these in same way argsparse would.
+        # Mainly used for testing.
+            class Args(object):
+                pass
+
+            self.args = Args()
+            for key, value in kwargs.items():
+                setattr(self.args, key, value)
+        else:
+        # If the command is created from the command line, we'll have arguments
+        # to parse.
+            parser = argparse.ArgumentParser(
+                description="Taming the bull: Change management for Agresso systems")
+            self._add_arguments(parser)
+            self.args, unknown = parser.parse_known_args()
+
         self._logger = logging.getLogger(__name__)
-        self._add_arguments(parser)
-        self.args, unknown = parser.parse_known_args()
         Session.initialise_session()
         self._execute()
 
