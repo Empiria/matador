@@ -105,7 +105,6 @@ class AddTicketToPackage(Command):
             f.write('- %s\n' % self.args.ticket)
             f.close()
 
-        add_to_git(
-            Session.project_folder,
-            'Add ticket %s to package %s' % (
+        stage_file(package_file)
+        commit('Add ticket %s to package %s' % (
                 self.args.ticket, self.args.package))
