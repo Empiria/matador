@@ -106,5 +106,3 @@ class AddTicketToPackage(Command):
             Session.project_folder,
             'Add ticket %s to package %s' % (
                 self.args.ticket, self.args.package))
-
-
