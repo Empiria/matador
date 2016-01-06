@@ -1,13 +1,12 @@
-from matador.session import Session
 from dulwich.repo import Repo
 from dulwich.client import LocalGitClient
 from pathlib import Path
-from os import chdir
+from matador.session import Session
 from globals import project, credentials, environments
 
 
-def test_initialise_session(project_repo):
-    Session.initialise_session()
+def test_initialise(project_repo):
+    Session.initialise()
     assert Session.project_folder == project_repo
     assert Session.project == project
     assert Session.matador_project_folder == Path(
@@ -19,7 +18,6 @@ def test_initialise_session(project_repo):
 
 def test_set_environment(project_repo):
     env = 'test'
-    Session.initialise_session()
     Session.set_environment(env)
     config = Repo(str(Session.matador_repository_folder)).get_config()
     assert config.get(b'core', b'sparsecheckout') == b'true'
