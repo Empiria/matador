@@ -8,6 +8,7 @@ from os import chdir
 from matador.session import Session
 from globals import project, credentials, environments
 
+
 @pytest.fixture
 def session(request):
 
