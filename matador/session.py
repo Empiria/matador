@@ -74,7 +74,7 @@ def initialise_repository(proj_folder, repo_folder):
 
 def project_folder():
     """Return the path to the project root directory."""
-    return Path(Repo.discover().index_path()).parents[1]
+    return Path(Repo.discover().path)
 
 
 class Session(object):
