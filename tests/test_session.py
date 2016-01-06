@@ -7,7 +7,6 @@ from globals import project, credentials, environments
 
 
 def test_initialise_session(project_repo):
-    chdir(str(project_repo))
     Session.initialise_session()
     assert Session.project_folder == project_repo
     assert Session.project == project
@@ -20,7 +19,6 @@ def test_initialise_session(project_repo):
 
 def test_set_environment(project_repo):
     env = 'test'
-    chdir(str(project_repo))
     Session.initialise_session()
     Session.set_environment(env)
     config = Repo(str(Session.matador_repository_folder)).get_config()

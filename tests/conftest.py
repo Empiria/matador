@@ -4,6 +4,7 @@ from shutil import rmtree
 from dulwich.errors import NotGitRepository
 from dulwich.repo import Repo
 import yaml
+from os import chdir
 from globals import project, credentials, environments
 
 
@@ -42,5 +43,7 @@ def project_repo(tmpdir, request):
     ])
 
     repo.do_commit(message=b'Create config files')
+
+    chdir(str(repo_folder))
 
     return repo_folder
