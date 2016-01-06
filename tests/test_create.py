@@ -66,7 +66,3 @@ def test_create_package(project_repo):
     expected_message = bytes(
         'Create package %s\n' % test_package, encoding='UTF-8')
     assert commit_message == expected_message
-
-
-def test_add_ticket_to_package(project_repo):
-    assert 'Not Implemented' is True
