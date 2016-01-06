@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 from .command import Command
 from matador.session import Session
-import os
+from pathlib import Path
+from os import devnull
 import subprocess
 
 
 def add_to_git(directory, message):
     subprocess.run([
-        'git', '-C', directory, 'add', '-A'],
+        'git', '-C', str(directory), 'add', '-A'],
         stderr=subprocess.STDOUT,
-        stdout=open(os.devnull, 'w'))
+        stdout=open(devnull, 'w'))
 
     subprocess.run([
-        'git', '-C', directory, 'commit', '-m', message],
+        'git', '-C', str(directory), 'commit', '-m', message],
         stderr=subprocess.STDOUT,
-        stdout=open(os.devnull, 'w'))
+        stdout=open(devnull, 'w'))
 
 
 class CreateTicket(Command):
@@ -29,12 +30,12 @@ class CreateTicket(Command):
             help='Ticket name')
 
     def _execute(self):
-        ticket_folder = os.path.join(
+        ticket_folder = Path(
             Session.project_folder, 'deploy', 'tickets', self.args.ticket)
-        os.makedirs(ticket_folder)
-        deploy_file = os.path.join(ticket_folder, 'deploy.py')
+        Path.mkdir(ticket_folder, parents=True, exist_ok=True)
+        deploy_file = Path(ticket_folder, 'deploy.py')
 
-        with open(deploy_file, 'w') as f:
+        with deploy_file.open('w') as f:
             f.write('from matador.commands.deployment import *\n\n')
             f.close()
 
@@ -54,20 +55,20 @@ class CreatePackage(Command):
             help='Ticket name')
 
     def _execute(self):
-        package_folder = os.path.join(
+        package_folder = Path(
             Session.project_folder, 'deploy', 'packages', self.args.package)
-        os.makedirs(package_folder)
+        Path.mkdir(package_folder, parents=True, exist_ok=True)
 
-        package_file = os.path.join(package_folder, 'tickets.yml')
-        with open(package_file, 'w') as f:
+        package_file = Path(package_folder, 'tickets.yml')
+        with package_file.open('w') as f:
             f.write(
                 '# List each ticket on a separate line preceded by - . e.g.\n')
             f.write('# - 30\n')
             f.write('# - 31\n')
             f.close()
 
-        remove_file = os.path.join(package_folder, 'remove.py')
-        with open(remove_file, 'w') as f:
+        remove_file = Path(package_folder, 'remove.py')
+        with remove_file.open('w') as f:
             f.write('from matador.commands.deployment import *\n\n')
             f.close()
 
@@ -93,11 +94,11 @@ class AddTicketToPackage(Command):
             help='Ticket name')
 
     def _execute(self):
-        package_file = os.path.join(
+        package_file = Path(
             Session.project_folder, 'deploy', 'packages', self.args.package,
             'tickets.yml')
 
-        with open(package_file, 'a') as f:
+        with package_file.open('a') as f:
             f.write('- %s\n' % self.args.ticket)
             f.close()
 
