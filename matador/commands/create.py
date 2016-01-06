@@ -6,14 +6,16 @@ from os import devnull
 import subprocess
 
 
-def add_to_git(directory, message):
+def stage_file(file):
     subprocess.run([
-        'git', '-C', str(directory), 'add', '-A'],
+        'git', '-C', str(Session.project_folder), 'add', str(file)],
         stderr=subprocess.STDOUT,
         stdout=open(devnull, 'w'))
 
+
+def commit(message):
     subprocess.run([
-        'git', '-C', str(directory), 'commit', '-m', message],
+        'git', '-C', str(Session.project_folder), 'commit', '-m', message],
         stderr=subprocess.STDOUT,
         stdout=open(devnull, 'w'))
 
@@ -39,9 +41,8 @@ class CreateTicket(Command):
             f.write('from matador.commands.deployment import *\n\n')
             f.close()
 
-        add_to_git(
-            Session.project_folder, 'Create ticket %s' % self.args.ticket)
-
+        stage_file(deploy_file)
+        commit('Create ticket %s' % self.args.ticket)
 
 class CreatePackage(Command):
 
@@ -66,14 +67,15 @@ class CreatePackage(Command):
             f.write('# - 30\n')
             f.write('# - 31\n')
             f.close()
+        stage_file(package_file)
 
         remove_file = Path(package_folder, 'remove.py')
         with remove_file.open('w') as f:
             f.write('from matador.commands.deployment import *\n\n')
             f.close()
+        stage_file(remove_file)
 
-        add_to_git(
-            Session.project_folder, 'Create package %s' % self.args.package)
+        commit('Create package %s' % self.args.package)
 
 
 class AddTicketToPackage(Command):
