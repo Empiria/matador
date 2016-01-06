@@ -1,7 +1,6 @@
 import matador.commands.create as cmd
 from matador.session import Session
 from dulwich.repo import Repo
-from dulwich.diff_tree import tree_changes
 from pathlib import Path
 
 
