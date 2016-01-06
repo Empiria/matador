@@ -1,13 +1,20 @@
-from matador.commands import CreateTicket, CreatePackage
+from matador.commands.create import add_to_git, CreateTicket, CreatePackage
 from dulwich.repo import Repo
 from pathlib import Path
 
 
 def test_add_to_git(project_repo):
-    pass
+    Path(project_repo, 'test_file').touch()
+    message = b'Test commit\n'
+    add_to_git(project_repo, message)
+
+    repo = Repo(str(project_repo))
+    last_commit = repo.get_object(repo.head())
+    commit_message = last_commit.message
+    assert commit_message == message
 
 
-def test_create_ticket(session, project_repo):
+def test_create_ticket(project_repo):
     test_ticket = 'test-ticket'
     CreateTicket(ticket=test_ticket)
 
@@ -24,7 +31,7 @@ def test_create_ticket(session, project_repo):
     assert commit_message == expected_message
 
 
-def test_create_package(session, project_repo):
+def test_create_package(project_repo):
     test_package = 'test-package'
     CreatePackage(package=test_package)
 
