@@ -2,15 +2,18 @@
 from .command import Command
 from matador.session import Session
 from pathlib import Path
+from dulwich.repo import Repo
 from os import devnull
 import subprocess
 
 
 def stage_file(file):
-    subprocess.run([
-        'git', '-C', str(Session.project_folder), 'add', str(file)],
-        stderr=subprocess.STDOUT,
-        stdout=open(devnull, 'w'))
+    # subprocess.run([
+    #     'git', '-C', str(Session.project_folder), 'add', str(file)],
+    #     stderr=subprocess.STDOUT,
+    #     stdout=open(devnull, 'w'))
+    repo = Repo(str(Session.project_folder))
+    repo.stage([str(file)])
 
 
 def commit(message):

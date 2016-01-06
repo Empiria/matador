@@ -1,23 +1,25 @@
 import matador.commands.create as cmd
+from matador.session import Session
 from dulwich.repo import Repo
 from dulwich.diff_tree import tree_changes
 from pathlib import Path
 
 
 def test_stage_file(project_repo):
+    Session.initialise()
     test_file = Path(project_repo, 'test_file')
     test_file.touch()
     cmd.stage_file(test_file)
 
     repo = Repo(str(project_repo))
     index = repo.open_index()
-    tree = repo[b'HEAD'].tree
-    changes = list(tree_changes(repo, tree, index.commit(repo.object_store)))
+    changes = [f.decode('UTF-8') for f in index]
 
-    assert changes == 'hello'
+    assert str(test_file) in changes
 
 
 def test_commit(project_repo):
+    Session.initialise()
     test_file = Path(project_repo, 'test_file')
     test_file.touch()
     message = b'Test commit\n'
