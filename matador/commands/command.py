@@ -26,7 +26,7 @@ class Command(object):
             self.args, unknown = parser.parse_known_args()
 
         self._logger = logging.getLogger(__name__)
-        Session.initialise_session()
+        Session.initialise()
         self._execute()
 
     def _add_arguments(self, parser):
