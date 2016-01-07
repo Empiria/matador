@@ -14,22 +14,22 @@ def test_stage_file(project_repo):
     index = repo.open_index()
     changes = [f.decode('UTF-8') for f in index]
 
-    assert str(test_file) in changes
+    assert str(test_file.relative_to(project_repo)) in changes
 
 
 def test_commit(project_repo):
     Session.initialise()
     test_file = Path(project_repo, 'test_file')
     test_file.touch()
-    message = b'Test commit\n'
+    message = 'Test commit'
     repo = Repo(str(project_repo))
-    repo.stage([str(test_file)])
+    repo.stage([str(test_file.relative_to(project_repo))])
 
     cmd.commit(message)
 
     last_commit = repo.get_object(repo.head())
     commit_message = last_commit.message
-    assert commit_message == message
+    assert commit_message == bytes(message, encoding='UTF-8')
 
 
 def test_create_ticket(project_repo):
@@ -45,7 +45,7 @@ def test_create_ticket(project_repo):
     last_commit = repo.get_object(repo.head())
     commit_message = last_commit.message
     expected_message = bytes(
-        'Create ticket %s\n' % test_ticket, encoding='UTF-8')
+        'Create ticket %s' % test_ticket, encoding='UTF-8')
     assert commit_message == expected_message
 
 
@@ -64,7 +64,7 @@ def test_create_package(project_repo):
     last_commit = repo.get_object(repo.head())
     commit_message = last_commit.message
     expected_message = bytes(
-        'Create package %s\n' % test_package, encoding='UTF-8')
+        'Create package %s' % test_package, encoding='UTF-8')
     assert commit_message == expected_message
 
 

@@ -6,15 +6,17 @@ import subprocess
 
 
 def stage_file(file):
-    Session.project_repo.stage([str(file)])
+    file_path = str(file.relative_to(Session.project_folder))
+    Session.project_repo.stage(file_path)
 
 
 def commit(message):
-    # Session.project_repo.do_commit(bytes(message, encoding='UTF-8'))
-    subprocess.run([
-        'git', '-C', str(Session.project_folder), 'commit', '-m', message],
-        stderr=subprocess.STDOUT,
-        stdout=open(devnull, 'w'))
+    message = bytes(message, encoding='UTF-8')
+    Session.project_repo.do_commit(message)
+    # subprocess.run([
+    #     'git', '-C', str(Session.project_folder), 'commit', '-m', message],
+    #     stderr=subprocess.STDOUT,
+    #     stdout=open(devnull, 'w'))
 
 
 class CreateTicket(Command):
