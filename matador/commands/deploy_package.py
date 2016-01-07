@@ -2,6 +2,7 @@
 from .command import Command
 from .deploy_ticket import execute_ticket
 from matador.session import Session
+from pathlib import Path
 import subprocess
 import os
 import shutil
@@ -35,26 +36,26 @@ class ActionPackage(Command):
     def _checkout_package(package, commit):
         proj_folder = Session.project_folder
         repo_folder = Session.matador_repository_folder
-        package_folder = os.path.join(
+        package_folder = Path(
             Session.matador_packages_folder, package)
 
-        shutil.rmtree(package_folder, ignore_errors=True)
+        shutil.rmtree(str(package_folder), ignore_errors=True)
 
         Session.update_repository()
 
         if commit == 'none':
             commit = subprocess.check_output(
-                ['git', '-C', proj_folder, 'rev-parse', 'HEAD'],
+                ['git', '-C', str(proj_folder), 'rev-parse', 'HEAD'],
                 stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
 
         subprocess.run([
-            'git', '-C', repo_folder, 'checkout', commit],
+            'git', '-C', str(repo_folder), 'checkout', commit],
             stderr=subprocess.STDOUT,
             stdout=open(os.devnull, 'w'),
             check=True)
 
-        src = os.path.join(repo_folder, 'deploy', 'packages', package)
-        shutil.copytree(src, package_folder)
+        src = Path(repo_folder, 'deploy', 'packages', package)
+        shutil.copytree(str(src), str(package_folder))
 
     def _execute(self):
         Session.set_environment(self.args.environment)
@@ -65,18 +66,18 @@ class DeployPackage(ActionPackage):
 
     def _execute(self):
         super(DeployPackage, self)._execute()
-        package_folder = os.path.join(
+        package_folder = Path(
             Session.matador_packages_folder, self.args.package)
         Session.deployment_folder = package_folder
-        ticketsFile = os.path.join(package_folder, 'tickets.yml')
+        ticketsFile = Path(package_folder, 'tickets.yml')
 
-        tickets = yaml.load(open(ticketsFile, 'r'))
+        file = ticketsFile.open('r')
+        tickets = yaml.load(file)
         for ticket in tickets:
             self._logger.info('*' * 25)
             self._logger.info('Deploying ticket %s' % ticket)
             self._logger.info('*' * 25)
             execute_ticket(str(ticket), 'deploy', self.args.commit, True)
-
 
 
 class RemovePackage(ActionPackage):
