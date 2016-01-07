@@ -1,4 +1,4 @@
-import matador.commands.create as cmd
+import matador.commands as cmd
 from dulwich.repo import Repo
 from pathlib import Path
 
