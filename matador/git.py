@@ -29,4 +29,4 @@ def checkout(repo, ref=None):
         ref = 'HEAD'
     index = repo.index_path()
     tree_id = repo[ref].tree
-    build_index_from_tree(repo.path,index, repo.object_store, tree_id)
+    build_index_from_tree(repo.path, index, repo.object_store, tree_id)
