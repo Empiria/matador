@@ -1,8 +1,6 @@
 from .command import Command
 from matador.session import Session
 from pathlib import Path
-from os import devnull
-import subprocess
 
 
 def stage_file(file):
@@ -13,10 +11,6 @@ def stage_file(file):
 def commit(message):
     message = bytes(message, encoding='UTF-8')
     Session.project_repo.do_commit(message)
-    # subprocess.run([
-    #     'git', '-C', str(Session.project_folder), 'commit', '-m', message],
-    #     stderr=subprocess.STDOUT,
-    #     stdout=open(devnull, 'w'))
 
 
 class CreateTicket(Command):
