@@ -118,7 +118,7 @@ class Session(object):
     def set_environment(self, environment):
         """Set a specific environment for those commands which require it."""
 
-        if self.project_folder is None:
+        if self.project_repo is None:
             self.initialise()
 
         if self.environment is None:
