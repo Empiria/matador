@@ -60,4 +60,4 @@ def project_repo(tmpdir, request, repo, session):
 
     chdir(str(repo_folder))
 
-    return repo_folder
+    return repo

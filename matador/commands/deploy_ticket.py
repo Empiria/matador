@@ -2,6 +2,7 @@
 from .command import Command
 from matador.commands.deployment import *
 from matador.session import Session
+from pathlib import Path
 import subprocess
 import os
 import shutil
@@ -11,7 +12,7 @@ from importlib.machinery import SourceFileLoader
 def _checkout_ticket(ticket, repo_folder, ticket_folder, commit):
 
     subprocess.run([
-        'git', '-C', repo_folder, 'checkout', commit],
+        'git', '-C', str(repo_folder), 'checkout', commit],
         stderr=subprocess.STDOUT,
         stdout=open(os.devnull, 'w'),
         check=True)
@@ -23,8 +24,7 @@ def _checkout_ticket(ticket, repo_folder, ticket_folder, commit):
 def execute_ticket(ticket, action, commit, packaged=False):
     proj_folder = Session.project_folder
     repo_folder = Session.matador_repository_folder
-    ticket_folder = os.path.join(
-        Session.matador_tickets_folder, ticket)
+    ticket_folder = Path(Session.matador_tickets_folder, ticket)
     Session.deployment_folder = ticket_folder
 
     shutil.rmtree(ticket_folder, ignore_errors=True)
@@ -40,7 +40,7 @@ def execute_ticket(ticket, action, commit, packaged=False):
     _checkout_ticket(ticket, repo_folder, ticket_folder, commit)
 
     actionFile = action + '.py'
-    sourceFile = os.path.join(ticket_folder, actionFile)
+    sourceFile = Path(ticket_folder, actionFile)
     SourceFileLoader(action, sourceFile).load_module()
 
 

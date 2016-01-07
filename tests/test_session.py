@@ -7,7 +7,7 @@ from globals import project, credentials, environments
 
 def test_initialise(project_repo):
     Session.initialise()
-    assert Session.project_folder == project_repo
+    assert Session.project_folder == Path(project_repo.path)
     assert Session.project == project
     assert Session.matador_project_folder == Path(
         Path.home(), '.matador', project)
