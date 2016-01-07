@@ -17,8 +17,8 @@ def _checkout_ticket(ticket, repo_folder, ticket_folder, commit):
         stdout=open(os.devnull, 'w'),
         check=True)
 
-    src = os.path.join(repo_folder, 'deploy', 'tickets', ticket)
-    shutil.copytree(src, ticket_folder)
+    src = Path(repo_folder, 'deploy', 'tickets', ticket)
+    shutil.copytree(str(src), str(ticket_folder))
 
 
 def execute_ticket(ticket, action, commit, packaged=False):
@@ -39,9 +39,9 @@ def execute_ticket(ticket, action, commit, packaged=False):
 
     _checkout_ticket(ticket, repo_folder, ticket_folder, commit)
 
-    actionFile = action + '.py'
+    actionFile = Path(action + '.py')
     sourceFile = Path(ticket_folder, actionFile)
-    SourceFileLoader(action, sourceFile).load_module()
+    SourceFileLoader(action, str(sourceFile)).load_module()
 
 
 class ActionTicket(Command):
