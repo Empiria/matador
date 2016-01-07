@@ -1,35 +1,6 @@
 import matador.commands.create as cmd
-from matador.session import Session
 from dulwich.repo import Repo
 from pathlib import Path
-
-
-def test_stage_file(project_repo):
-    Session.initialise()
-    test_file = Path(project_repo, 'test_file')
-    test_file.touch()
-    cmd.stage_file(test_file)
-
-    repo = Repo(str(project_repo))
-    index = repo.open_index()
-    changes = [f.decode('UTF-8') for f in index]
-
-    assert str(test_file.relative_to(project_repo)) in changes
-
-
-def test_commit(project_repo):
-    Session.initialise()
-    test_file = Path(project_repo, 'test_file')
-    test_file.touch()
-    message = 'Test commit'
-    repo = Repo(str(project_repo))
-    repo.stage([str(test_file.relative_to(project_repo))])
-
-    cmd.commit(message)
-
-    last_commit = repo.get_object(repo.head())
-    commit_message = last_commit.message
-    assert commit_message == bytes(message, encoding='UTF-8')
 
 
 def test_create_ticket(project_repo):

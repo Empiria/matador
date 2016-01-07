@@ -1,16 +1,7 @@
 from .command import Command
 from matador.session import Session
+from matador import git
 from pathlib import Path
-
-
-def stage_file(file):
-    file_path = str(file.relative_to(Session.project_folder))
-    Session.project_repo.stage(file_path)
-
-
-def commit(message):
-    message = bytes(message, encoding='UTF-8')
-    Session.project_repo.do_commit(message)
 
 
 class CreateTicket(Command):
@@ -34,8 +25,8 @@ class CreateTicket(Command):
             f.write('from matador.commands.deployment import *\n\n')
             f.close()
 
-        stage_file(deploy_file)
-        commit('Create ticket %s' % self.args.ticket)
+        git.stage_file(deploy_file)
+        git.commit('Create ticket %s' % self.args.ticket)
 
 
 class CreatePackage(Command):
@@ -61,15 +52,15 @@ class CreatePackage(Command):
             f.write('# - 30\n')
             f.write('# - 31\n')
             f.close()
-        stage_file(package_file)
+        git.stage_file(package_file)
 
         remove_file = Path(package_folder, 'remove.py')
         with remove_file.open('w') as f:
             f.write('from matador.commands.deployment import *\n\n')
             f.close()
-        stage_file(remove_file)
+        git.stage_file(remove_file)
 
-        commit('Create package %s' % self.args.package)
+        git.commit('Create package %s' % self.args.package)
 
 
 class AddTicketToPackage(Command):
@@ -98,6 +89,6 @@ class AddTicketToPackage(Command):
             f.write('- %s\n' % self.args.ticket)
             f.close()
 
-        stage_file(package_file)
-        commit('Add ticket %s to package %s' % (
+        git.stage_file(package_file)
+        git.commit('Add ticket %s to package %s' % (
                 self.args.ticket, self.args.package))
