@@ -60,7 +60,8 @@ class CreatePackage(Command):
             f.close()
         git.stage_file(Session.project_repo, remove_file)
 
-        git.commit(Session.project_repo, 'Create package %s' % self.args.package)
+        git.commit(
+            Session.project_repo, 'Create package %s' % self.args.package)
 
 
 class AddTicketToPackage(Command):
