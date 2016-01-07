@@ -2,7 +2,6 @@
 import logging
 import yaml
 from dulwich.repo import Repo
-from dulwich.client import LocalGitClient
 from dulwich.errors import NotGitRepository
 from configparser import ConfigParser
 from pathlib import Path
@@ -154,11 +153,7 @@ class Session(object):
         if self.matador_repo is None:
             self._initialise_matador_repository()
 
-        refs = LocalGitClient().fetch(str(self.project_folder), self.matador_repo)
-
-        for key, value in refs.items():
-            key = key.replace(b'heads', b'remotes/origin')
-            self.matador_repo.refs[key] = value
+        git.fetch_all(self.project_repo, self.matador_repo)
 
     @classmethod
     def clear(self):
