@@ -16,6 +16,7 @@ def session(request):
         Session.clear()
     request.addfinalizer(finalise)
 
+
 @pytest.fixture
 def repo(tmpdir, request):
     repo_folder = Path(str(tmpdir), project)

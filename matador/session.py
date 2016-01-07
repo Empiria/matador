@@ -6,6 +6,7 @@ from dulwich.client import LocalGitClient
 from dulwich.errors import NotGitRepository
 from configparser import ConfigParser
 from pathlib import Path
+from matador import git
 
 logger = logging.getLogger(__name__)
 
@@ -76,15 +77,13 @@ class Session(object):
 
     """A class to hold variables for a matador session."""
 
-    project_folder = None
+    project_repo = None
+    matador_repo = None
     environment = None
 
     @classmethod
     def initialise(self):
-        """Set the project name and folders for its repositories."""
-        if self.project_folder is not None:
-            return
-        else:
+        if self.project_repo is None:
             self.project_repo = Repo.discover()
             self.project_folder = Path(self.project_repo.path)
 
@@ -97,6 +96,8 @@ class Session(object):
                 self.matador_project_folder, 'repository')
 
             self.environments = get_environments(self.project_folder)
+        else:
+            return
 
     @classmethod
     def _initialise_matador_repository(self):
@@ -111,7 +112,8 @@ class Session(object):
         except NotGitRepository:
             repo = initialise_repository(
                 self.project_folder, self.matador_repository_folder)
-        return repo
+
+        self.matador_repo = repo
 
     @classmethod
     def set_environment(self, environment):
@@ -120,9 +122,7 @@ class Session(object):
         if self.project_folder is None:
             self.initialise()
 
-        if self.environment is not None:
-            return
-        else:
+        if self.environment is None:
             self._initialise_matador_repository()
             self.environment = self.environments[environment]
             credentials = get_credentials(self.project_folder)
@@ -141,26 +141,27 @@ class Session(object):
                 self.matador_tickets_folder, parents=True, exist_ok=True)
             Path.mkdir(
                 self.matador_packages_folder, parents=True, exist_ok=True)
+        else:
+            return
 
     @classmethod
     def update_repository(self):
         """Fetch all from the project repo to the matador repo."""
 
-        if self.project_folder is None:
+        if self.project_repo is None:
             self.initialise()
 
-        try:
-            repo = Repo(str(self.matador_repository_folder))
-        except NotGitRepository:
-            repo = self._initialise_matador_repository()
+        if self.matador_repo is None:
+            self._initialise_matador_repository()
 
-        refs = LocalGitClient().fetch(str(self.project_folder), repo)
+        refs = LocalGitClient().fetch(str(self.project_folder), self.matador_repo)
 
         for key, value in refs.items():
             key = key.replace(b'heads', b'remotes/origin')
-            repo.refs[key] = value
+            self.matador_repo.refs[key] = value
 
     @classmethod
     def clear(self):
-        self.project_folder = None
+        self.project_repo = None
+        self.matador_repo = None
         self.environment = None
