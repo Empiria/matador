@@ -2,9 +2,8 @@
 from .command import Command
 from .deploy_ticket import execute_ticket
 from matador.session import Session
+from matador import git
 from pathlib import Path
-import subprocess
-import os
 import shutil
 import yaml
 from importlib.machinery import SourceFileLoader
@@ -34,7 +33,6 @@ class ActionPackage(Command):
 
     @staticmethod
     def _checkout_package(package, commit):
-        proj_folder = Session.project_folder
         repo_folder = Session.matador_repository_folder
         package_folder = Path(
             Session.matador_packages_folder, package)
@@ -43,16 +41,7 @@ class ActionPackage(Command):
 
         Session.update_repository()
 
-        if commit == 'none':
-            commit = subprocess.check_output(
-                ['git', '-C', str(proj_folder), 'rev-parse', 'HEAD'],
-                stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
-
-        subprocess.run([
-            'git', '-C', str(repo_folder), 'checkout', commit],
-            stderr=subprocess.STDOUT,
-            stdout=open(os.devnull, 'w'),
-            check=True)
+        git.checkout(Session.matador_repo, bytes(commit, encoding='utf-8'))
 
         src = Path(repo_folder, 'deploy', 'packages', package)
         shutil.copytree(str(src), str(package_folder))
@@ -84,9 +73,9 @@ class RemovePackage(ActionPackage):
 
     def _execute(self):
         super(RemovePackage, self)._execute()
-        package_folder = os.path.join(
+        package_folder = Path(
             Session.matador_packages_folder, self.args.package)
         Session.deployment_folder = package_folder
-        sourceFile = os.path.join(package_folder, 'remove.py')
+        sourceFile = Path(package_folder, 'remove.py')
 
-        SourceFileLoader('remove', sourceFile).load_module()
+        SourceFileLoader('remove', str(sourceFile)).load_module()

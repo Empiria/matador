@@ -52,3 +52,23 @@ def test_deploy_package(project_repo):
     assert ticket_file_1.exists()
     assert ticket_file_2.exists()
     assert checked_out_file.exists()
+
+
+def test_remove_package(project_repo):
+    env = 'test'
+    package = 'test_package'
+    package_folder = Path(project_repo.path, 'deploy', 'packages', package)
+    package_file = Path(package_folder, 'remove.py')
+    package_folder.mkdir(parents=True)
+    package_file.touch()
+    package_path = str(package_file.relative_to(project_repo.path))
+    project_repo.stage([
+        bytes(package_path, encoding='UTF-8')])
+    project_repo.do_commit(message=b'Create test package')
+
+    cmd.RemovePackage(environment=env, package=package, commit='HEAD')
+
+    checked_out_file = Path(
+        Path.home(), '.matador', gbl.project, env, 'packages', package,
+        'remove.py')
+    assert checked_out_file.exists()

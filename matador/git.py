@@ -26,7 +26,8 @@ def fetch_all(source_repo, target_repo, remote_name=None):
 
 def checkout(repo, ref=None):
     if ref is None:
-        ref = 'HEAD'
+        ref = repo.head()
     index = repo.index_path()
     tree_id = repo[ref].tree
     build_index_from_tree(repo.path, index, repo.object_store, tree_id)
+    return [repo.object_store.iter_tree_contents(tree_id)]

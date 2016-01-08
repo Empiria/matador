@@ -2,28 +2,21 @@
 from .command import Command
 from matador.commands.deployment import *
 from matador.session import Session
+from matador import git
 from pathlib import Path
-import subprocess
-import os
 import shutil
 from importlib.machinery import SourceFileLoader
 
 
-def _checkout_ticket(ticket, repo_folder, ticket_folder, commit):
+def _checkout_ticket(ticket, repo, ticket_folder, commit):
 
-    subprocess.run([
-        'git', '-C', str(repo_folder), 'checkout', commit],
-        stderr=subprocess.STDOUT,
-        stdout=open(os.devnull, 'w'),
-        check=True)
+    git.checkout(repo, bytes(commit, encoding='utf-8'))
 
-    src = Path(repo_folder, 'deploy', 'tickets', ticket)
+    src = Path(repo.path, 'deploy', 'tickets', ticket)
     shutil.copytree(str(src), str(ticket_folder))
 
 
 def execute_ticket(ticket, action, commit, packaged=False):
-    proj_folder = Session.project_folder
-    repo_folder = Session.matador_repository_folder
     ticket_folder = Path(Session.matador_tickets_folder, ticket)
     Session.deployment_folder = ticket_folder
 
@@ -32,12 +25,7 @@ def execute_ticket(ticket, action, commit, packaged=False):
     if not packaged:
         Session.update_repository()
 
-    if commit == 'none':
-        commit = subprocess.check_output(
-            ['git', '-C', proj_folder, 'rev-parse', 'HEAD'],
-            stderr=subprocess.STDOUT).decode('utf-8').strip('\n')
-
-    _checkout_ticket(ticket, repo_folder, ticket_folder, commit)
+    _checkout_ticket(ticket, Session.matador_repo, ticket_folder, commit)
 
     actionFile = Path(action + '.py')
     sourceFile = Path(ticket_folder, actionFile)
