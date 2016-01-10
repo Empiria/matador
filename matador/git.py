@@ -41,10 +41,12 @@ def substitute_keywords(text, repo, ref):
     commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
     timezone = format_timezone(commit.commit_timezone).decode(encoding='ascii')
     commit_timestamp = commit_time + ' ' + timezone
+    author = commit.author.decode(encoding='ascii')
 
     substitutions = {
         'version': ref,
         'date': commit_timestamp,
+        'author': author
     }
 
     new_text = ''

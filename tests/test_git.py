@@ -34,6 +34,7 @@ def test_substitute_keywords(project_repo):
         First line
         version:
         date:
+        author:
         Last line"""
 
     commit_ref = project_repo.head()
@@ -41,12 +42,14 @@ def test_substitute_keywords(project_repo):
     commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
     timezone = format_timezone(commit.commit_timezone).decode(encoding='ascii')
     commit_timestamp = commit_time + ' ' + timezone
+    author = commit.author.decode(encoding='ascii')
 
     expected_result = """\
         First line
         version: %s
         date: %s
-        Last line""" % (commit_ref, commit_timestamp)
+        author: %s
+        Last line""" % (commit_ref, commit_timestamp, author)
 
     result = git.substitute_keywords(
         test_text, project_repo, commit_ref)
