@@ -1,5 +1,8 @@
 from dulwich.client import LocalGitClient
 from dulwich.index import build_index_from_tree
+from dulwich.objects import format_timezone
+from time import strftime, gmtime
+import re
 
 
 def stage_file(repo, file):
@@ -31,3 +34,24 @@ def checkout(repo, ref=None):
     tree_id = repo[ref].tree
     build_index_from_tree(repo.path, index, repo.object_store, tree_id)
     return [repo.object_store.iter_tree_contents(tree_id)]
+
+
+def substitute_keywords(text, repo, ref):
+    commit = repo.get_object(ref)
+    commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
+    timezone = format_timezone(commit.commit_timezone).decode(encoding='ascii')
+    commit_timestamp = commit_time + ' ' + timezone
+
+    substitutions = {
+        'version': ref,
+        'date': commit_timestamp,
+    }
+
+    new_text = ''
+    for line in text.splitlines(keepends=True):
+        for key, value in substitutions.items():
+            rexp = '%s:.*' % key
+            line = re.sub(rexp, '%s: %s' % (key, value), line)
+        new_text += line
+
+    return new_text

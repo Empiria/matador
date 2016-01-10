@@ -1,6 +1,7 @@
 from matador import git
 from pathlib import Path
-
+from time import strftime, gmtime
+from dulwich.objects import format_timezone
 
 def test_stage_file(repo):
     repo_folder = Path(repo.path)
@@ -26,3 +27,27 @@ def test_commit(repo):
     last_commit = repo.get_object(repo.head())
     commit_message = last_commit.message
     assert commit_message == bytes(message, encoding='UTF-8')
+
+
+def test_substitute_keywords(project_repo):
+    test_text = """\
+        First line
+        version:
+        date:
+        Last line"""
+
+    commit_ref = project_repo.head()
+    commit = project_repo.get_object(commit_ref)
+    commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
+    timezone = format_timezone(commit.commit_timezone).decode(encoding='ascii')
+    commit_timestamp = commit_time + ' ' + timezone
+
+    expected_result = """\
+        First line
+        version: %s
+        date: %s
+        Last line""" % (commit_ref, commit_timestamp)
+
+    result = git.substitute_keywords(
+        test_text, project_repo, commit_ref)
+    assert result == expected_result
