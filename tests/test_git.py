@@ -29,28 +29,54 @@ def test_commit(repo):
     assert commit_message == bytes(message, encoding='UTF-8')
 
 
-def test_substitute_keywords(project_repo):
-    test_text = """\
-        First line
-        version:
-        date:
-        author:
-        Last line"""
+def test_full_ref_commit(project_repo):
+    head = project_repo.head().decode(encoding='ascii')
+    ref = git.full_ref(project_repo, head)
+    assert ref == head
 
-    commit_ref = project_repo.head()
-    commit = project_repo.get_object(commit_ref)
-    commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
-    timezone = format_timezone(commit.commit_timezone).decode(encoding='ascii')
-    commit_timestamp = commit_time + ' ' + timezone
-    author = commit.author.decode(encoding='ascii')
 
-    expected_result = """\
-        First line
-        version: %s
-        date: %s
-        author: %s
-        Last line""" % (commit_ref, commit_timestamp, author)
+def test_full_ref_branch(project_repo):
+    ref = git.full_ref(project_repo, 'master')
+    print(project_repo.refs.keys())
+    assert ref == 'refs/heads/master'
 
-    result = git.substitute_keywords(
-        test_text, project_repo, commit_ref)
-    assert result == expected_result
+
+def test_full_ref_tag(project_repo):
+    ref = git.full_ref(project_repo, 'test-tag')
+    assert ref == 'refs/tags/test-tag'
+
+
+
+# def test_substitute_keywords(project_repo):
+#     test_text = """\
+#         First line
+#         version:
+#         date:
+#         author:
+#         Last line"""
+
+#     commit_ref = project_repo.head()
+#     commit = project_repo.get_object(commit_ref)
+#     commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
+#     timezone = format_timezone(commit.commit_timezone).decode(encoding='ascii')
+#     commit_timestamp = commit_time + ' ' + timezone
+#     author = commit.author.decode(encoding='ascii')
+
+#     result = git.substitute_keywords(test_text, project_repo, 'master')
+#     expected_result = """\
+#         First line
+#         version: %s
+#         date: %s
+#         author: %s
+#         Last line""" % (commit_ref, commit_timestamp, author)
+#     assert result == expected_result
+
+#     project_repo.refs[b'refs/tags/test-tag'] = commit_ref
+#     result = git.substitute_keywords(test_text, project_repo, 'test-tag')
+#     expected_result = """\
+#         First line
+#         version: %s
+#         date: %s
+#         author: %s
+#         Last line""" % (commit_ref, commit_timestamp, author)
+#     assert result == expected_result

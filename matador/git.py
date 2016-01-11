@@ -36,15 +36,30 @@ def checkout(repo, ref=None):
     return [repo.object_store.iter_tree_contents(tree_id)]
 
 
+def full_ref(repo, ref):
+    refs = repo.refs.keys()
+    for ref_type in ['refs/heads/', 'refs/tags/']:
+        full_ref = ref_type + ref
+        if bytes(full_ref, encoding='ascii') in refs:
+            ref = full_ref
+    return ref
+
+
 def substitute_keywords(text, repo, ref):
+    ref = full_ref(repo, ref)
     commit = repo.get_object(ref)
     commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
     timezone = format_timezone(commit.commit_timezone).decode(encoding='ascii')
     commit_timestamp = commit_time + ' ' + timezone
     author = commit.author.decode(encoding='ascii')
 
+    if ref.startswith(b'refs/tags'):
+        version = 'Tag %s (%s)' % (ref, commit.id)
+    else:
+        version = commit.id
+
     substitutions = {
-        'version': ref,
+        'version': version,
         'date': commit_timestamp,
         'author': author
     }
