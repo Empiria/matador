@@ -1,8 +1,11 @@
+import logging
 from dulwich.client import LocalGitClient
 from dulwich.index import build_index_from_tree
 from dulwich.objects import format_timezone
 from time import strftime, gmtime
 import re
+
+logger = logging.getLogger(__name__)
 
 
 def stage_file(repo, file):
@@ -46,29 +49,37 @@ def full_ref(repo, ref):
 
 
 def substitute_keywords(text, repo, ref):
-    ref = full_ref(repo, ref)
-    commit = repo.get_object(ref)
-    commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
-    timezone = format_timezone(commit.commit_timezone).decode(encoding='ascii')
-    commit_timestamp = commit_time + ' ' + timezone
-    author = commit.author.decode(encoding='ascii')
-
-    if ref.startswith(b'refs/tags'):
-        version = 'Tag %s (%s)' % (ref, commit.id)
-    else:
-        version = commit.id
-
-    substitutions = {
-        'version': version,
-        'date': commit_timestamp,
-        'author': author
-    }
-
     new_text = ''
-    for line in text.splitlines(keepends=True):
-        for key, value in substitutions.items():
-            rexp = '%s:.*' % key
-            line = re.sub(rexp, '%s: %s' % (key, value), line)
-        new_text += line
+    expanded_ref = full_ref(repo, ref)
+
+    try:
+        sha = repo.refs[bytes(expanded_ref, encoding='ascii')]
+
+        commit = repo.get_object(sha)
+        commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
+        timezone = format_timezone(
+            commit.commit_timezone).decode(encoding='ascii')
+        commit_timestamp = commit_time + ' ' + timezone
+        author = commit.author.decode(encoding='ascii')
+
+        if ref.startswith('refs/tags'):
+            version = 'Tag %s (%s)' % (ref, commit.id)
+        else:
+            version = commit.id
+
+        substitutions = {
+            'version': version,
+            'date': commit_timestamp,
+            'author': author
+        }
+
+        for line in text.splitlines(keepends=True):
+            for key, value in substitutions.items():
+                rexp = '%s:.*' % key
+                line = re.sub(rexp, '%s: %s' % (key, value), line)
+            new_text += line
+
+    except KeyError:
+        logger.error('%s is not a valid branch or tag' % ref)
 
     return new_text
