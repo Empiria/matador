@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+from pathlib import Path
 import subprocess
 from matador.session import Session
 from .deployment import DeploymentCommand, substitute_keywords
@@ -8,12 +9,12 @@ from matador.commands.run_sql_script import run_sql_script
 
 def _checkout_script(path, commit):
     repo_folder = Session.matador_repository_folder
-    scriptPath = os.path.join(repo_folder, path)
-    targetScript = os.path.join(
-        Session.deployment_folder, os.path.basename(scriptPath))
+    scriptPath = Path(repo_folder, path)
+    targetScript = Path(
+        Session.deployment_folder, scriptPath.name)
 
     subprocess.run(
-        ['git', '-C', repo_folder, 'checkout', commit],
+        ['git', '-C', str(repo_folder), 'checkout', commit],
         stderr=subprocess.STDOUT,
         stdout=open(os.devnull, 'w'),
         check=True)
