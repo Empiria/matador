@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from pathlib import Path
 import os
 import subprocess
 from string import Template
@@ -19,22 +20,23 @@ def _sql_script(file_path):
 
 
 def run_sql_script(logger, file_path):
+    file = Path(file_path)
     message = Template(
         'Matador: Executing ${file} against ${connection} \n')
     substitutions = {
-        'file': file_path.name,
+        'file': file.name,
         'connection': Session.environment['connection']
     }
     logger.info(message.substitute(substitutions))
 
-    script = _sql_script(file_path)
+    script = _sql_script(file)
     connection_string = _connection_string(
         Session.environment['dbms'],
         Session.environment['connection'],
         Session.credentials['user'],
         Session.credentials['password'])
 
-    os.chdir(str(file_path.parent))
+    os.chdir(str(file.parent))
 
     if Session.environment['dbms'].lower() == 'oracle':
         script += '\nshow error'

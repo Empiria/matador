@@ -37,7 +37,7 @@ class DeploySqlScript(DeploymentCommand):
             script = _fetch_script(
                 Session.matador_repo, path, commit, Session.deployment_folder)
 
-        run_sql_script(self._logger, script)
+        run_sql_script(self._logger, str(script))
 
 
 class DeployOraclePackage(DeploymentCommand):
