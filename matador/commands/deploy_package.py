@@ -41,20 +41,28 @@ class ActionPackage(Command):
 
         Session.update_repository()
 
-        git.checkout(Session.matador_repo, bytes(commit, encoding='utf-8'))
+        git.checkout(Session.matador_repo, commit)
 
         src = Path(repo_folder, 'deploy', 'packages', package)
         shutil.copytree(str(src), str(package_folder))
 
     def _execute(self):
         Session.set_environment(self.args.environment)
-        self._checkout_package(self.args.package, self.args.commit)
+        if self.args.commit == 'none':
+            commit = None
+        else:
+            commit = self.args.commit
+        self._checkout_package(self.args.package, commit)
 
 
 class DeployPackage(ActionPackage):
 
     def _execute(self):
         super(DeployPackage, self)._execute()
+        if self.args.commit == 'none':
+            commit = None
+        else:
+            commit = self.args.commit
         package_folder = Path(
             Session.matador_packages_folder, self.args.package)
         Session.deployment_folder = package_folder
@@ -66,7 +74,7 @@ class DeployPackage(ActionPackage):
             self._logger.info('*' * 25)
             self._logger.info('Deploying ticket %s' % ticket)
             self._logger.info('*' * 25)
-            execute_ticket(str(ticket), 'deploy', self.args.commit, True)
+            execute_ticket(str(ticket), 'deploy', commit, True)
 
 
 class RemovePackage(ActionPackage):

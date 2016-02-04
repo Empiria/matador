@@ -12,8 +12,9 @@ def _connection_string(dbms, connection, user, password):
 
 
 def _sql_script(file_path):
-    file = open(file_path, 'r')
-    script = file.read()
+    with file_path.open('r') as f:
+        script = f.read()
+        f.close()
     return script
 
 
@@ -21,7 +22,7 @@ def run_sql_script(logger, file_path):
     message = Template(
         'Matador: Executing ${file} against ${connection} \n')
     substitutions = {
-        'file': os.path.basename(file_path),
+        'file': file_path.name,
         'connection': Session.environment['connection']
     }
     logger.info(message.substitute(substitutions))
@@ -33,7 +34,7 @@ def run_sql_script(logger, file_path):
         Session.credentials['user'],
         Session.credentials['password'])
 
-    os.chdir(os.path.dirname(file_path))
+    os.chdir(str(file_path.parent))
 
     if Session.environment['dbms'].lower() == 'oracle':
         script += '\nshow error'

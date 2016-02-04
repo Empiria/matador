@@ -9,10 +9,13 @@ from importlib.machinery import SourceFileLoader
 
 
 def _checkout_ticket(ticket, repo, ticket_folder, commit):
+    if commit is not None:
+        commit = bytes(commit, encoding='utf-8')
 
-    git.checkout(repo, bytes(commit, encoding='utf-8'))
+    git.checkout(repo, commit)
 
     src = Path(repo.path, 'deploy', 'tickets', ticket)
+    shutil.rmtree(str(ticket_folder), ignore_errors=True)
     shutil.copytree(str(src), str(ticket_folder))
 
 
@@ -63,7 +66,11 @@ class ActionTicket(Command):
 
     def _execute(self):
         Session.set_environment(self.args.environment)
-        execute_ticket(self.args.ticket, self.action, self.args.commit, False)
+        if self.args.commit == 'none':
+            commit = None
+        else:
+            commit = self.args.commit
+        execute_ticket(self.args.ticket, self.action, commit, False)
 
 
 class DeployTicket(ActionTicket):

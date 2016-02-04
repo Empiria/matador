@@ -13,7 +13,7 @@ def _fetch_script(repo, script_path, commit_ref, target_folder):
     git.checkout(repo, commit_ref)
 
     with script.open('r') as f:
-        original_text = f.read_text()
+        original_text = f.read()
         f.close()
 
     new_text = git.substitute_keywords(original_text, repo, commit_ref)
@@ -30,7 +30,7 @@ class DeploySqlScript(DeploymentCommand):
     def _execute(self):
         path = Path(self.args[0])
 
-        if path.parent.samefile(Path('.')):
+        if str(path.parent) == '.':
             script = Path(Session.deployment_folder, path)
         else:
             commit = self.args[1]

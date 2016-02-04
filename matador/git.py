@@ -25,18 +25,10 @@ def fetch_all(source_repo, target_repo, remote_name=None):
     refs = LocalGitClient().fetch(source_repo.path, target_repo)
 
     for key, value in refs.items():
-        key = key.replace(
+        remote_key = key.replace(
             b'heads', b'remotes/%s' % bytes(remote_name, encoding='UTF-8'))
-        target_repo.refs[key] = value
-
-
-def checkout(repo, ref=None):
-    if ref is None:
-        ref = repo.head()
-    index = repo.index_path()
-    tree_id = repo[ref].tree
-    build_index_from_tree(repo.path, index, repo.object_store, tree_id)
-    return [repo.object_store.iter_tree_contents(tree_id)]
+        target_repo.refs[remote_key] = value
+        target_repo[key] = value
 
 
 def full_ref(repo, ref):
@@ -46,6 +38,17 @@ def full_ref(repo, ref):
         if bytes(full_ref, encoding='ascii') in refs:
             ref = full_ref
     return ref
+
+
+def checkout(repo, ref=None):
+    if ref is None:
+        ref = repo.head()
+    else:
+        ref = bytes(full_ref(repo, ref), encoding='ascii')
+    index = repo.index_path()
+    tree_id = repo[ref].tree
+    build_index_from_tree(repo.path, index, repo.object_store, tree_id)
+    return [repo.object_store.iter_tree_contents(tree_id)]
 
 
 def substitute_keywords(text, repo, ref):
