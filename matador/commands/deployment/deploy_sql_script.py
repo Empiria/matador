@@ -31,13 +31,13 @@ class DeploySqlScript(DeploymentCommand):
         path = Path(self.args[0])
 
         if path.parent.samefile(Path('.')):
-            target_script = Path(Session.deployment_folder, path)
+            script = Path(Session.deployment_folder, path)
         else:
             commit = self.args[1]
-            target_script = _fetch_script(
+            script = _fetch_script(
                 Session.matador_repo, path, commit, Session.deployment_folder)
 
-        run_sql_script(self._logger, target_script)
+        run_sql_script(self._logger, script)
 
 
 class DeployOraclePackage(DeploymentCommand):
