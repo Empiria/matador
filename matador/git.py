@@ -9,16 +9,45 @@ logger = logging.getLogger(__name__)
 
 
 def stage_file(repo, file):
+    """Stage a file to the index
+
+    The equivalent of :code:`git add`
+
+    Parameters
+    ----------
+    repo : dulwich.repo.Repo
+    file : pathlib.Path
+    """
     file_path = str(file.relative_to(repo.path))
     repo.stage(file_path)
 
 
 def commit(repo, message):
+    """Commit the index to the repository
+
+    The equivalent of :code:`git commit`
+
+    Parameters
+    ----------
+    repo : dulwich.repo.Repo
+    message : str
+    """
     message = bytes(message, encoding='UTF-8')
     repo.do_commit(message)
 
 
 def fetch_all(source_repo, target_repo, remote_name=None):
+    """Fetch branches and tags from a remote repository
+
+    Unlike :code:`git fetch`, this will also update local branches to point at the
+    same commit as their remote counterpart.
+
+     Parameters
+    ----------
+    source_repo : dulwich.repo.Repo
+    target_repo : dulwich.repo.Repo
+    remote_name : str
+    """
     if remote_name is None:
         remote_name = 'origin'
 
@@ -32,6 +61,21 @@ def fetch_all(source_repo, target_repo, remote_name=None):
 
 
 def full_ref(repo, ref):
+    """Generate a fully qualified git reference
+
+    If ref refers to a branch or tag, the function will return the correct
+    fully qualified reference, otherwise it returns the ref as provided.
+
+    e.g. for ref 'master', return 'refs/heads/master'
+
+    Parameters
+    ----------
+    repo : dulwich.repo.Repo
+
+    Returns
+    -------
+    str
+    """
     refs = repo.refs.keys()
     for ref_type in ['refs/heads/', 'refs/tags/']:
         full_ref = ref_type + ref
@@ -41,6 +85,19 @@ def full_ref(repo, ref):
 
 
 def checkout(repo, ref=None):
+    """Checkout the commit from a given ref to the working directory
+
+    The equivalent of :code:`git checkout`
+
+    Parameters
+    ----------
+    repo : dulwich.repo.Repo
+    ref : str
+
+    Returns
+    -------
+    list
+    """
     if ref is None:
         ref = repo.head()
     else:
@@ -52,6 +109,21 @@ def checkout(repo, ref=None):
 
 
 def substitute_keywords(text, repo, ref):
+    """Perform keyword substitution on given text
+
+    Substitutes the keywords 'version:', 'date:' and 'author:' with the
+    relevant attributes extracted from the repository for the given ref.
+
+    Parameters
+    ----------
+    text : str
+    repo : dulwich.repo.Repo
+    ref : str
+
+    Returns
+    -------
+    str
+    """
     new_text = ''
     expanded_ref = full_ref(repo, ref)
 
