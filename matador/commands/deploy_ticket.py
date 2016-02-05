@@ -9,11 +9,7 @@ from importlib.machinery import SourceFileLoader
 
 
 def _checkout_ticket(ticket, repo, ticket_folder, commit):
-    if commit is not None:
-        commit = bytes(commit, encoding='utf-8')
-
     git.checkout(repo, commit)
-
     src = Path(repo.path, 'deploy', 'tickets', ticket)
     shutil.rmtree(str(ticket_folder), ignore_errors=True)
     shutil.copytree(str(src), str(ticket_folder))
