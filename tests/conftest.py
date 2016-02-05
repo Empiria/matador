@@ -56,7 +56,9 @@ def project_repo(tmpdir, request, repo, session):
         bytes(str(creds_file.relative_to(repo_folder)), encoding='UTF-8')
     ])
 
-    commit = repo.do_commit(message=b'Create config files')
+    commit = repo.do_commit(
+        message=b'Create config files',
+        committer=b"Test Example <test@example.org>")
 
     repo.refs[b'refs/heads/master'] = commit
     repo.refs[b'refs/tags/test-tag'] = commit
