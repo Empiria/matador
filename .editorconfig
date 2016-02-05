@@ -11,6 +11,9 @@ charset = utf-8
 trim_trailing_whitespace = true
 indent_style = space
 
+[*.rst]
+indent_size = 3
+
 [*.{py, md, rst}]
 indent_size = 4
 

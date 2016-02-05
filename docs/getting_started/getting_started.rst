@@ -1,63 +1,69 @@
-.. _getting-started:
+.. installing_python:
 
-Pre-Requisites
-==============
+Python 3
+========
 
-There are two items of software that you will need to install before you can
-install Matador itself:
+   Ensure you have a Python 3 interpreter installed on your machine. The recommended interpreter is Anaconda from continuum.io and, on Windows, is the only interpreter on which matador has been tested.
 
-#.  Git
+   * Download the Anaconda interpreter from https://www.continuum.io/downloads
 
-    Download and install the current version for your operating system from
-    https://git-scm.com/download
+      Ensure you choose a Python 3.x (3.5 at the time of writing) version rather
+      than a 2.x version.
 
-#.  The Anaconda Python Distribution
+   * Install the interpreter using the download from above and accept all the default options.
 
-    Download and install the current version of Anaconda for Python 3 (e.g. 3.5)
-    from https://www.continuum.io/downloads
+   * From a command prompt, enter the following command::
 
+      python --version
+
+   and you should see something similar to::
+
+      Python 3.5.0 :: Anaconda 2.4.0 (64-bit)
+
+.. installing_matador:
 
 Installing Matador
 ==================
 
 Your Python installation should include the Python Package Manager, Pip, which
-can now be used to install Matador. From a command line, type::
+can now be used to install Matador:
 
-    pip install matador
+   * From a command prompt, enter the following command::
 
-You should now be able to call Matador commands from your command line. To test,
-enter::
+      pip install matador
 
-    matador --help
+  * When the installation has finished, test that it worked with::
 
-and you should see::
+      matador --help
 
-    usage: matador [-h] [-l LOGGING_DESTINATION] [-v VERBOSITY] command
+  You should see something similar to::
 
-    Taming the bull: Change management for Agresso systems
+      usage: matador [-h] [-l LOGGING_DESTINATION] [-v VERBOSITY] command
 
-    positional arguments:
-      command               Command
+      Taming the bull: Change management for Agresso systems
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      -l LOGGING_DESTINATION, --logging LOGGING_DESTINATION
-                            logging (none, console or file)
-      -v VERBOSITY, --verbosity VERBOSITY
-                            Logging level. DEBUG, INFO, ERROR or CRITICAL
-    usage: matador [-h] [-l LOGGING_DESTINATION] [-v VERBOSITY] command
+      positional arguments:
+        command               Command
 
-    Taming the bull: Change management for Agresso systems
+      optional arguments:
+        -h, --help            show this help message and exit
+        -l LOGGING_DESTINATION, --logging LOGGING_DESTINATION
+                              logging (none, console or file)
+        -v VERBOSITY, --verbosity VERBOSITY
+                              Logging level. DEBUG, INFO, ERROR or CRITICAL
+      usage: matador [-h] [-l LOGGING_DESTINATION] [-v VERBOSITY] command
 
-    positional arguments:
-      command               Command
+      Taming the bull: Change management for Agresso systems
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      -l LOGGING_DESTINATION, --logging LOGGING_DESTINATION
-                            logging (none, console or file)
-      -v VERBOSITY, --verbosity VERBOSITY
-                            Logging level. DEBUG, INFO, ERROR or CRITICAL
+      positional arguments:
+        command               Command
+
+      optional arguments:
+        -h, --help            show this help message and exit
+        -l LOGGING_DESTINATION, --logging LOGGING_DESTINATION
+                              logging (none, console or file)
+        -v VERBOSITY, --verbosity VERBOSITY
+                              Logging level. DEBUG, INFO, ERROR or CRITICAL
 
 A Matador Project
 =================
@@ -71,6 +77,6 @@ to a directory of your choice and change into that directory.
 e.g. on Windows, to create a folder for a project named 'toreador' within an
 existing 'c:\\projects' folder::
 
-  cd c:\projects
-  git clone <url for the toreador project>
-  cd toreador
+    cd c:\projects
+    git clone <url for the toreador project>
+    cd toreador
