@@ -24,9 +24,11 @@ def repo(tmpdir, request):
         repo = Repo(str(repo_folder))
     except NotGitRepository:
         repo = Repo.init(str(repo_folder), mkdir=True)
+        config_file = Path(repo_folder, '.git', 'config')
         config = repo.get_config()
-        config.set('user', 'name', 'Test Example')
-        config.set('user', 'email', 'test@example.org')
+        config.set(b'user', b'name', b'Test Example')
+        config.set(b'user', b'email', b'test@example.org')
+        config.write_to_path(str(config_file))
     return repo
 
 

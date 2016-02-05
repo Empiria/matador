@@ -34,9 +34,11 @@ def test_commit(repo):
 def test_fetch_all(tmpdir, project_repo):
     target_repo_folder = Path(str(tmpdir), 'test_remote')
     target_repo = Repo.init(str(target_repo_folder), mkdir=True)
+    config_file = Path(target_repo_folder, '.git', 'config')
     config = target_repo.get_config()
-    config.set('user', 'name', 'Test Example')
-    config.set('user', 'email', 'test@example.org')
+    config.set(b'user', b'name', b'Test Example')
+    config.set(b'user', b'email', b'test@example.org')
+    config.write_to_path(str(config_file))
     ref = project_repo.head()
 
     git.fetch_all(project_repo, target_repo)
