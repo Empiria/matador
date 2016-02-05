@@ -6,3 +6,7 @@
 
 Matador
 =======
+
+A change management tool for Agresso systems.
+
+Documentation at http://matador.readthedocs.org/
