@@ -57,6 +57,7 @@ def substitute_keywords(text, repo, ref):
 
     try:
         sha = repo.refs[bytes(expanded_ref, encoding='ascii')]
+        short_sha = sha[:7].decode(encoding='ascii')
 
         commit = repo.get_object(sha)
         commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
@@ -66,9 +67,9 @@ def substitute_keywords(text, repo, ref):
         author = commit.author.decode(encoding='ascii')
 
         if ref.startswith('refs/tags'):
-            version = 'Tag %s (%s)' % (ref, commit.id)
+            version = 'Tag %s (%s)' % (ref, short_sha)
         else:
-            version = commit.id
+            version = short_sha
 
         substitutions = {
             'version': version,

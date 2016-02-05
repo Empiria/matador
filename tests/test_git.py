@@ -56,6 +56,7 @@ def test_substitute_keywords(project_repo):
         Last line"""
 
     commit_ref = project_repo.head()
+    short_ref = commit_ref[:7].decode(encoding='ascii')
     commit = project_repo.get_object(commit_ref)
     commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
     timezone = format_timezone(commit.commit_timezone).decode(encoding='ascii')
@@ -68,7 +69,7 @@ def test_substitute_keywords(project_repo):
         version: %s
         date: %s
         author: %s
-        Last line""" % (commit_ref, commit_timestamp, author)
+        Last line""" % (short_ref, commit_timestamp, author)
     assert result == expected_result
 
     result = git.substitute_keywords(test_text, project_repo, 'test-tag')
@@ -77,7 +78,7 @@ def test_substitute_keywords(project_repo):
         version: %s
         date: %s
         author: %s
-        Last line""" % (commit_ref, commit_timestamp, author)
+        Last line""" % (short_ref, commit_timestamp, author)
     assert result == expected_result
 
     result = git.substitute_keywords(test_text, project_repo, 'test-garbage')
