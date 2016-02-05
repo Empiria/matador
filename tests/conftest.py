@@ -24,6 +24,9 @@ def repo(tmpdir, request):
         repo = Repo(str(repo_folder))
     except NotGitRepository:
         repo = Repo.init(str(repo_folder), mkdir=True)
+        config = repo.get_config()
+        config.set('user', 'name', 'Test Example')
+        config.set('user', 'email', 'test@example.org')
     return repo
 
 
@@ -56,9 +59,7 @@ def project_repo(tmpdir, request, repo, session):
         bytes(str(creds_file.relative_to(repo_folder)), encoding='UTF-8')
     ])
 
-    commit = repo.do_commit(
-        message=b'Create config files',
-        committer=b"Test Example <test@example.org>")
+    commit = repo.do_commit(message=b'Create config files')
 
     repo.refs[b'refs/heads/master'] = commit
     repo.refs[b'refs/tags/test-tag'] = commit
