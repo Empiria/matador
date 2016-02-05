@@ -2,6 +2,7 @@ from matador import git
 from pathlib import Path
 from time import strftime, gmtime
 from dulwich.objects import format_timezone
+from dulwich.repo import Repo
 
 
 def test_stage_file(repo):
@@ -28,6 +29,19 @@ def test_commit(repo):
     last_commit = repo.get_object(repo.head())
     commit_message = last_commit.message
     assert commit_message == bytes(message, encoding='UTF-8')
+
+
+def test_fetch_all(tmpdir, project_repo):
+    target_repo_folder = Path(str(tmpdir), 'test_remote')
+    target_repo = Repo.init(str(target_repo_folder), mkdir=True)
+    ref = project_repo.head()
+
+    git.fetch_all(project_repo, target_repo)
+
+    assert b'refs/remotes/origin/master' in target_repo.refs
+    assert b'refs/heads/master' in target_repo.refs
+    assert target_repo.refs[b'refs/remotes/origin/master'] == ref
+    assert target_repo.refs[b'refs/heads/master'] == ref
 
 
 def test_full_ref_commit(project_repo):
