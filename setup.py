@@ -27,6 +27,8 @@ setup(
     },
     url='http://www.empiria.co.uk',
     packages=find_packages(),
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
     install_requires=['pyyaml', 'dulwich'],
     license='The MIT License (MIT)',
     description='Change management for Agresso systems',
