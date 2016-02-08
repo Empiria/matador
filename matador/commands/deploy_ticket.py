@@ -19,7 +19,7 @@ def execute_ticket(ticket, action, commit, packaged=False):
     ticket_folder = Path(Session.matador_tickets_folder, ticket)
     Session.deployment_folder = ticket_folder
 
-    shutil.rmtree(ticket_folder, ignore_errors=True)
+    shutil.rmtree(str(ticket_folder), ignore_errors=True)
 
     if not packaged:
         Session.update_repository()
