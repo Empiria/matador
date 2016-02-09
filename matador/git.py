@@ -1,7 +1,7 @@
 import logging
 from dulwich.client import LocalGitClient
 from dulwich.index import build_index_from_tree
-from dulwich.objects import format_timezone
+from dulwich.objects import Tag, format_timezone
 from time import strftime, gmtime
 import re
 
@@ -39,8 +39,8 @@ def commit(repo, message):
 def fetch_all(source_repo, target_repo, remote_name=None):
     """Fetch branches and tags from a remote repository
 
-    Unlike :code:`git fetch`, this will also update local branches to point at the
-    same commit as their remote counterpart.
+    Unlike :code:`git fetch`, this will also update local branches to point at
+    the same commit as their remote counterpart.
 
      Parameters
     ----------
@@ -102,8 +102,14 @@ def checkout(repo, ref=None):
         ref = repo.head()
     else:
         ref = bytes(full_ref(repo, ref), encoding='ascii')
+
+    if isinstance(repo[ref], Tag):
+        sha = repo[ref].object[1]
+        tree_id = repo[sha].tree
+    else:
+        tree_id = repo[ref].tree
+
     index = repo.index_path()
-    tree_id = repo[ref].tree
     build_index_from_tree(repo.path, index, repo.object_store, tree_id)
     return [repo.object_store.iter_tree_contents(tree_id)]
 
@@ -125,12 +131,15 @@ def substitute_keywords(text, repo, ref):
     str
     """
     new_text = ''
-    expanded_ref = full_ref(repo, ref)
+    expanded_ref = bytes(full_ref(repo, ref), encoding='ascii')
 
     try:
-        sha = repo.refs[bytes(expanded_ref, encoding='ascii')]
-        short_sha = sha[:7].decode(encoding='ascii')
+        if isinstance(repo[expanded_ref], Tag):
+            sha = repo[expanded_ref].object[1]
+        else:
+            sha = repo.refs[expanded_ref]
 
+        short_sha = sha[:7].decode(encoding='ascii')
         commit = repo.get_object(sha)
         commit_time = strftime('%Y-%m-%d %H:%M:%S', gmtime(commit.commit_time))
         timezone = format_timezone(
