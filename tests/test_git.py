@@ -73,6 +73,20 @@ def test_checkout(project_repo):
     assert creds_file.exists()
 
 
+def test_checkout_branch(project_repo):
+    creds_file = Path(project_repo.path, 'config', 'credentials.yml')
+    creds_file.unlink()
+    git.checkout(project_repo, 'master')
+    assert creds_file.exists()
+
+
+def test_checkout_tag(project_repo):
+    creds_file = Path(project_repo.path, 'config', 'credentials.yml')
+    creds_file.unlink()
+    git.checkout(project_repo, 'test-tag')
+    assert creds_file.exists()
+
+
 def test_substitute_keywords(project_repo):
     test_text = """\
         First line
