@@ -54,7 +54,7 @@ def initialise_repository(proj_folder, repo_folder):
 
     config['core']['sparsecheckout'] = 'true'
     config['remote "origin"'] = {
-        'url': proj_folder,
+        'url': proj_folder.as_posix(),
         'fetch': '+refs/heads/*:refs/remotes/origin/*'
     }
 
