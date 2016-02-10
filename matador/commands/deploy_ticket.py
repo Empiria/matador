@@ -63,7 +63,7 @@ class ActionTicket(Command):
     def _execute(self):
         Session.set_environment(self.args.environment)
         if self.args.commit == 'none':
-            commit = None
+            commit = Session.project_repo.head().decode(encoding='ascii')
         else:
             commit = self.args.commit
         execute_ticket(self.args.ticket, self.action, commit, False)
