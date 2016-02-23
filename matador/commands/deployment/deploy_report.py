@@ -4,6 +4,7 @@ from .deployment import DeploymentCommand
 from matador import git
 from matador import zippey
 import shutil
+from openpyxl import load_workbook
 
 
 def _fetch_report(repo, report_path, commit_ref, target_folder):
@@ -15,6 +16,11 @@ def _fetch_report(repo, report_path, commit_ref, target_folder):
 
     target_report.touch()
     zippey.decode(report.open('rb'), target_report.open('wb'))
+
+    workbook = load_workbook(str(target_report))
+    workbook.properties.creator = author
+    workbook.properties.version = version
+    workbook.save(str(target_report))
 
     return target_report
 
