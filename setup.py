@@ -29,7 +29,7 @@ setup(
     packages=find_packages(),
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
-    install_requires=['pyyaml', 'dulwich', 'XlsxWriter'],
+    install_requires=['pyyaml', 'dulwich',],
     license='The MIT License (MIT)',
     description='Change management for Agresso systems',
     classifiers=[
