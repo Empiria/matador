@@ -2,6 +2,7 @@ from .run_sql_script import RunSqlScript
 from .deploy_ticket import DeployTicket, RemoveTicket
 from .deploy_package import DeployPackage, RemovePackage
 from .create import CreateTicket, CreatePackage, AddTicketToPackage
+from .filter import CleanZip, SmudgeZip
 import os
 
 commands = {
@@ -13,6 +14,8 @@ commands = {
     'create-ticket': CreateTicket,
     'create-package': CreatePackage,
     'add-t2p': AddTicketToPackage,
+    'smudge-zip': SmudgeZip,
+    'clean-zip': CleanZip,
 }
 
 if os.name == 'nt':
