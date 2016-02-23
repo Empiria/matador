@@ -114,24 +114,11 @@ def checkout(repo, ref=None):
     return [repo.object_store.iter_tree_contents(tree_id)]
 
 
-def substitute_keywords(text, repo, ref):
-    """Perform keyword substitution on given text
-
-    Substitutes the keywords 'version:', 'date:' and 'author:' with the
-    relevant attributes extracted from the repository for the given ref.
-
-    Parameters
-    ----------
-    text : str
-    repo : dulwich.repo.Repo
-    ref : str
-
-    Returns
-    -------
-    str
-    """
-    new_text = ''
+def keyword_values(repo, ref):
     expanded_ref = bytes(full_ref(repo, ref), encoding='ascii')
+    version = None
+    commit_timestamp = None
+    author = None
 
     try:
         if isinstance(repo[expanded_ref], Tag):
@@ -152,6 +139,33 @@ def substitute_keywords(text, repo, ref):
         else:
             version = short_sha
 
+    except KeyError:
+        logger.error('%s is not a valid branch or tag' % ref)
+
+    return version, commit_timestamp, author
+
+
+def substitute_keywords(text, repo, ref):
+    """Perform keyword substitution on given text
+
+    Substitutes the keywords 'version:', 'date:' and 'author:' with the
+    relevant attributes extracted from the repository for the given ref.
+
+    Parameters
+    ----------
+    text : str
+    repo : dulwich.repo.Repo
+    ref : str
+
+    Returns
+    -------
+    str
+    """
+    new_text = ''
+    version, commit_timestamp, author = keyword_values(repo, ref)
+
+    if version is not None:
+
         substitutions = {
             'version': version,
             'date': commit_timestamp,
@@ -163,8 +177,5 @@ def substitute_keywords(text, repo, ref):
                 rexp = '%s:.*' % key
                 line = re.sub(rexp, '%s: %s' % (key, value), line)
             new_text += line
-
-    except KeyError:
-        logger.error('%s is not a valid branch or tag' % ref)
 
     return new_text
