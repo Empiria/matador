@@ -4,16 +4,25 @@ from .deployment import DeploymentCommand
 from matador import git
 from matador import zippey
 import shutil
+import xlsxwriter
 
 
 def _fetch_report(repo, report_path, commit_ref, target_folder):
     report = Path(repo.path, report_path)
     target_report = Path(target_folder, report.name)
+    version, commit_timestamp, author = git.keyword_values(repo, commit_ref)
 
     git.checkout(repo, commit_ref)
 
     target_report.touch()
     zippey.decode(report.open('rb'), target_report.open('wb'))
+
+    workbook = xlsxwriter.Workbook(str(target_report))
+    workbook.set_properties({
+        'author': author,
+        'status': version,
+        })
+    workbook.close()
 
     return target_report
 
