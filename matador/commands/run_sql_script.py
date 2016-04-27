@@ -7,9 +7,12 @@ from .command import Command
 from matador.session import Session
 
 
-def _connection_string(dbms, connection, user, password):
+def _sql_command(dbms, connection, user, password):
     if dbms.lower() == 'oracle':
-        return user + '/' + password + '@' + connection
+        command = [
+            'sqlplus', '-S', '-L', user + '/' + password + '@' + connection]
+
+    return command
 
 
 def _sql_script(file_path):
@@ -30,7 +33,7 @@ def run_sql_script(logger, file_path):
     logger.info(message.substitute(substitutions))
 
     script = _sql_script(file)
-    connection_string = _connection_string(
+    sql_command = _sql_command(
         Session.environment['dbms'],
         Session.environment['connection'],
         Session.credentials['user'],
@@ -41,7 +44,7 @@ def run_sql_script(logger, file_path):
     if Session.environment['dbms'].lower() == 'oracle':
         script += '\nshow error'
         process = subprocess.Popen(
-            ['sqlplus', '-S', '-L', connection_string],
+            sql_command,
             stdin=subprocess.PIPE,
             stderr=subprocess.PIPE)
         process.stdin.write(script.encode('utf-8'))
