@@ -8,11 +8,16 @@ from matador.session import Session
 
 
 def _sql_command(dbms, connection, user, password):
-    if dbms == 'oracle':
-        command = [
-            'sqlplus', '-S', '-L', user + '/' + password + '@' + connection]
+    commands = {
+        ('oracle', 'nt'): [
+            'sqlplus', '-S', '-L', user + '/' + password + '@' + connection],
+        ('oracle', 'posix'): [
+            'sqlplus', '-S', '-L', user + '/' + password + '@' + connection],
+        ('mssql', 'posix'): ['fisql'],
+        ('mssql', 'nt'): ['sqlcmd']
+    }
 
-    return command
+    return commands[(dbms, os.name)]
 
 
 def _sql_script(file_path):
