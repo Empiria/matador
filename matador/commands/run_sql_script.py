@@ -7,58 +7,55 @@ from .command import Command
 from matador.session import Session
 
 
-def _command(**db_args):
+def _command(**kwargs):
     oracle_connection = Template(
         '${user}/${password}@${server}:${port}/${db_name}')
     mssql_host = Template('${server}:${port}')
 
     commands = {
         ('oracle', 'nt'): [
-            'sqlplus', '-S', '-L', oracle_connection.substitute(db_args)],
+            'sqlplus', '-S', '-L', oracle_connection.substitute(kwargs)],
         ('mssql', 'posix'): [
-            'fisql', '-S', mssql_host.substitute(db_args),
-            '-D', db_args['db_name'], '-U', db_args['user'],
-            '-P', db_args['password']
+            'fisql', '-S', mssql_host.substitute(kwargs),
+            '-D', kwargs['db_name'], '-U', kwargs['user'],
+            '-P', kwargs['password']
         ],
         ('mssql', 'nt'): [
-            'sqlcmd', '-S', mssql_host.substitute(db_args),
-            '-D', db_args['db_name'], '-U', db_args['user'],
-            '-P', db_args['password']
+            'sqlcmd', '-S', mssql_host.substitute(kwargs),
+            '-D', kwargs['db_name'], '-U', kwargs['user'],
+            '-P', kwargs['password']
         ],
     }
     commands[('oracle', 'posix')] = commands[('oracle', 'nt')]
 
-    return commands[(db_args['dbms'], os.name)]
+    return commands[(kwargs['dbms'], os.name)]
 
 
-def _sql_script(dbms, file_path):
-    with file_path.open('r') as f:
+def _sql_script(**kwargs):
+    file = Path(kwargs['directory'], kwargs['file'])
+
+    with file.open('r') as f:
         script = f.read()
         f.close()
 
-    if dbms == 'oracle':
+    if kwargs['dbms'] == 'oracle':
         script += '\nshow error'
 
     return script.encode('utf-8')
 
 
-def run_sql_script(logger, file_path, **db_args):
-    file = Path(file_path)
+def run_sql_script(logger, **kwargs):
     message = Template(
-        'Matador: Executing ${file} against ${connection} \n')
-    substitutions = {
-        'file': file.name,
-        'connection': Session.environment['connection']
-    }
-    logger.info(message.substitute(substitutions))
+        'Matador: Executing ${file} against ${db_name} on ${server} \n')
+    logger.info(message.substitute(kwargs))
 
-    os.chdir(str(file.parent))
+    os.chdir(kwargs['directory'])
 
     process = subprocess.Popen(
-        _command(**db_args),
+        _command(**kwargs),
         stdin=subprocess.PIPE,
         stderr=subprocess.PIPE)
-    process.stdin.write(_sql_script(db_args['dbms'], file))
+    process.stdin.write(_sql_script(**kwargs))
     process.stdin.close()
     process.wait()
 
@@ -87,6 +84,8 @@ class RunSqlScript(Command):
 
     def _execute(self):
         Session.set_environment(self.args.environment)
-        file_path = os.path.join(self.args.directory, self.args.file)
-        db_args = {**Session.environment['database'], **Session.credentials}
-        run_sql_script(self._logger, file_path, **db_args)
+        kwargs = {
+            **Session.environment['database'],
+            **Session.credentials,
+            **self.args}
+        run_sql_script(self._logger, **kwargs)
