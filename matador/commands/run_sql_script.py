@@ -7,12 +7,27 @@ from .command import Command
 from matador.session import Session
 
 
-def _command(dbms, connection, user, password):
+def _command(dbms, server, port, database, user, password):
+    oracle_connection = Template(
+        '${user}/${password}@${server}:${port}/${database}')
+    mssql_host = Template('${server}:${port}')
+    subs = {
+        'user': user,
+        'password': password,
+        'server': server,
+        'port': port,
+        'database': database
+    }
+
     commands = {
         ('oracle', 'nt'): [
-            'sqlplus', '-S', '-L', user + '/' + password + '@' + connection],
-        ('mssql', 'posix'): ['fisql'],
-        ('mssql', 'nt'): ['sqlcmd']
+            'sqlplus', '-S', '-L', oracle_connection.substitute(subs)],
+        ('mssql', 'posix'): [
+            'fisql', '-S', mssql_host.substitute(subs), '-D',
+            database, '-U', user, '-P', password],
+        ('mssql', 'nt'): [
+            'sqlcmd', '-S', mssql_host.substitute(subs), '-D',
+            database, '-U', user, '-P', password],
     }
     commands[('oracle', 'posix')] = commands[('oracle', 'nt')]
 
@@ -30,7 +45,8 @@ def _sql_script(dbms, file_path):
     return script.encode('utf-8')
 
 
-def run_sql_script(logger, dbms, connection, user, password, file_path):
+def run_sql_script(logger, dbms, server, port, database, user, password,
+                   file_path):
     file = Path(file_path)
     message = Template(
         'Matador: Executing ${file} against ${connection} \n')
