@@ -23,11 +23,11 @@ def _command(dbms, server, port, database, user, password):
         ('oracle', 'nt'): [
             'sqlplus', '-S', '-L', oracle_connection.substitute(subs)],
         ('mssql', 'posix'): [
-            'fisql', '-S', mssql_host.substitute(subs), '-D',
-            database, '-U', user, '-P', password],
+            'fisql', '-S', mssql_host.substitute(subs),
+            '-D', database, '-U', user, '-P', password],
         ('mssql', 'nt'): [
-            'sqlcmd', '-S', mssql_host.substitute(subs), '-D',
-            database, '-U', user, '-P', password],
+            'sqlcmd', '-S', mssql_host.substitute(subs),
+            '-D', database, '-U', user, '-P', password],
     }
     commands[('oracle', 'posix')] = commands[('oracle', 'nt')]
 
