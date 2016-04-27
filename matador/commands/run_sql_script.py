@@ -8,7 +8,7 @@ from matador.session import Session
 
 
 def _sql_command(dbms, connection, user, password):
-    if dbms.lower() == 'oracle':
+    if dbms == 'oracle':
         command = [
             'sqlplus', '-S', '-L', user + '/' + password + '@' + connection]
 
@@ -22,7 +22,7 @@ def _sql_script(file_path):
     return script
 
 
-def run_sql_script(logger, file_path):
+def run_sql_script(logger, dbms, connection, user, password, file_path):
     file = Path(file_path)
     message = Template(
         'Matador: Executing ${file} against ${connection} \n')
@@ -33,23 +33,20 @@ def run_sql_script(logger, file_path):
     logger.info(message.substitute(substitutions))
 
     script = _sql_script(file)
-    sql_command = _sql_command(
-        Session.environment['dbms'],
-        Session.environment['connection'],
-        Session.credentials['user'],
-        Session.credentials['password'])
+    if dbms == 'oracle':
+        script += '\nshow error'
+
+    sql_command = _sql_command(dbms, connection, user, password)
 
     os.chdir(str(file.parent))
 
-    if Session.environment['dbms'].lower() == 'oracle':
-        script += '\nshow error'
-        process = subprocess.Popen(
-            sql_command,
-            stdin=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-        process.stdin.write(script.encode('utf-8'))
-        process.stdin.close()
-        process.wait()
+    process = subprocess.Popen(
+        sql_command,
+        stdin=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    process.stdin.write(script.encode('utf-8'))
+    process.stdin.close()
+    process.wait()
 
 
 class RunSqlScript(Command):
@@ -81,4 +78,8 @@ class RunSqlScript(Command):
 
         run_sql_script(
             self._logger,
+            Session.environment['dbms'].lower(),
+            Session.environment['connection'],
+            Session.credentials['user'],
+            Session.credentials['password'],
             file_path)
