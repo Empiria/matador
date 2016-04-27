@@ -10,18 +10,17 @@ from matador.session import Session
 def _command(**kwargs):
     oracle_connection = Template(
         '${user}/${password}@${server}:${port}/${db_name}')
-    mssql_host = Template('${server}:${port}')
 
     commands = {
         ('oracle', 'nt'): [
             'sqlplus', '-S', '-L', oracle_connection.substitute(kwargs)],
         ('mssql', 'posix'): [
-            'fisql', '-S', mssql_host.substitute(kwargs),
+            'bsqldb', '-S', kwargs['server'],
             '-D', kwargs['db_name'], '-U', kwargs['user'],
             '-P', kwargs['password']
         ],
         ('mssql', 'nt'): [
-            'sqlcmd', '-S', mssql_host.substitute(kwargs),
+            'sqlcmd', '-S', kwargs['server'],
             '-D', kwargs['db_name'], '-U', kwargs['user'],
             '-P', kwargs['password']
         ],
@@ -53,8 +52,7 @@ def run_sql_script(logger, **kwargs):
 
     process = subprocess.Popen(
         _command(**kwargs),
-        stdin=subprocess.PIPE,
-        stderr=subprocess.PIPE)
+        stdin=subprocess.PIPE)
     process.stdin.write(_sql_script(**kwargs))
     process.stdin.close()
     process.wait()
@@ -87,5 +85,5 @@ class RunSqlScript(Command):
         kwargs = {
             **Session.environment['database'],
             **Session.credentials,
-            **self.args}
+            **self.args.__dict__}
         run_sql_script(self._logger, **kwargs)
