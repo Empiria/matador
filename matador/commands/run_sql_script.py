@@ -11,11 +11,10 @@ def _sql_command(dbms, connection, user, password):
     commands = {
         ('oracle', 'nt'): [
             'sqlplus', '-S', '-L', user + '/' + password + '@' + connection],
-        ('oracle', 'posix'): [
-            'sqlplus', '-S', '-L', user + '/' + password + '@' + connection],
         ('mssql', 'posix'): ['fisql'],
         ('mssql', 'nt'): ['sqlcmd']
     }
+    commands[('oracle', 'posix')] = commands[('oracle', 'nt')]
 
     return commands[(dbms, os.name)]
 
