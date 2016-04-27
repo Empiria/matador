@@ -59,7 +59,7 @@ def run_sql_script(logger, dbms, server, port, database, user, password,
     os.chdir(str(file.parent))
 
     process = subprocess.Popen(
-        _command(dbms, connection, user, password),
+        _command(dbms, dbms, server, port, database, user, password),
         stdin=subprocess.PIPE,
         stderr=subprocess.PIPE)
     process.stdin.write(_sql_script(dbms, file))
@@ -96,8 +96,10 @@ class RunSqlScript(Command):
 
         run_sql_script(
             self._logger,
-            Session.environment['dbms'].lower(),
-            Session.environment['connection'],
+            Session.environment['database']['dbms'].lower(),
+            Session.environment['database']['server'],
+            Session.environment['database']['port'],
+            Session.environment['database']['db_name'],
             Session.credentials['user'],
             Session.credentials['password'],
             file_path)
