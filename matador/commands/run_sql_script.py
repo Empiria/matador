@@ -19,11 +19,15 @@ def _command(dbms, connection, user, password):
     return commands[(dbms, os.name)]
 
 
-def _sql_script(file_path):
+def _sql_script(dbms, file_path):
     with file_path.open('r') as f:
         script = f.read()
         f.close()
-    return script
+
+    if dbms == 'oracle':
+        script += '\nshow error'
+
+    return script.encode('utf-8')
 
 
 def run_sql_script(logger, dbms, connection, user, password, file_path):
@@ -36,17 +40,13 @@ def run_sql_script(logger, dbms, connection, user, password, file_path):
     }
     logger.info(message.substitute(substitutions))
 
-    script = _sql_script(file)
-    if dbms == 'oracle':
-        script += '\nshow error'
-
     os.chdir(str(file.parent))
 
     process = subprocess.Popen(
         _command(dbms, connection, user, password),
         stdin=subprocess.PIPE,
         stderr=subprocess.PIPE)
-    process.stdin.write(script.encode('utf-8'))
+    process.stdin.write(_sql_script(dbms, file))
     process.stdin.close()
     process.wait()
 
