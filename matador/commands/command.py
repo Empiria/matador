@@ -6,7 +6,7 @@ from matador.session import Session
 
 class Command(object):
 
-    def __init__(self, **kwargs):
+    def __init__(self, init_session=True, **kwargs):
         if kwargs:
             # If kwargs have been supplied, use these in same way argsparse
             # would.
@@ -30,7 +30,8 @@ class Command(object):
             self.args, unknown = parser.parse_known_args()
 
         self._logger = logging.getLogger(__name__)
-        Session.initialise()
+        if init_session:
+            Session.initialise()
         self._execute()
 
     def _add_arguments(self, parser):
