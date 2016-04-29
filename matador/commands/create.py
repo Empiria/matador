@@ -2,6 +2,7 @@ from .command import Command
 from matador.session import Session
 from matador import git
 from pathlib import Path
+from cookiecutter.main import cookiecutter
 
 
 class CreateProject(Command):
@@ -16,7 +17,10 @@ class CreateProject(Command):
             help='Project name')
 
     def _execute(self):
-        pass
+        cookiecutter(
+            'https://github.com/Empiria/matador-cookiecutter.git',
+            no_input=True,
+            extra_context={'project_name': self.args.project})
 
 
 class CreateTicket(Command):
