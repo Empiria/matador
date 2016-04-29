@@ -1,7 +1,7 @@
 from .run_sql_script import RunSqlScript
 from .deploy_ticket import DeployTicket, RemoveTicket
 from .deploy_package import DeployPackage, RemovePackage
-from .create import CreateTicket, CreatePackage, AddTicketToPackage
+from .create import CreateProject, CreateTicket, CreatePackage, AddTicketToPackage
 from .filter import CleanZip, SmudgeZip
 import os
 
@@ -11,6 +11,7 @@ commands = {
     'remove-ticket': RemoveTicket,
     'deploy-package': DeployPackage,
     'remove-package': RemovePackage,
+    'init': CreateProject,
     'create-ticket': CreateTicket,
     'create-package': CreatePackage,
     'add-t2p': AddTicketToPackage,

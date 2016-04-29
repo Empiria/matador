@@ -4,6 +4,21 @@ from matador import git
 from pathlib import Path
 
 
+class CreateProject(Command):
+
+    def _add_arguments(self, parser):
+        parser.prog = 'matador init'
+
+        parser.add_argument(
+            '-p', '--project',
+            type=str,
+            required=True,
+            help='Project name')
+
+    def _execute(self):
+        pass
+
+
 class CreateTicket(Command):
 
     def _add_arguments(self, parser):
