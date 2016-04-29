@@ -29,7 +29,7 @@ setup(
     packages=find_packages(),
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
-    install_requires=['pyyaml', 'dulwich', 'openpyxl'],
+    install_requires=['pyyaml', 'dulwich', 'openpyxl', 'cookiecutter'],
     license='The MIT License (MIT)',
     description='Change management for Agresso systems',
     classifiers=[
@@ -37,5 +37,5 @@ setup(
         'Environment :: Console',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English'
-        ]
-    )
+    ]
+)
