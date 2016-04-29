@@ -5,10 +5,10 @@ from pathlib import Path
 from cookiecutter.main import cookiecutter
 
 
-class CreateProject(object):
+class CreateProject(Command):
 
     def __init__(self):
-        Command.__init__(self, init_session=False)
+        super(CreateProject, self).__init__(init_session=False)
 
     def _add_arguments(self, parser):
         parser.prog = 'matador init'
