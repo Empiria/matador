@@ -12,7 +12,7 @@ except LookupError:
 
 setup(
     name='Matador',
-    version='1.6.2',
+    version='2.0.0',
     author='Owen Campbell',
     author_email='owen.campbell@empiria.co.uk',
     entry_points={
@@ -33,7 +33,6 @@ setup(
     license='The MIT License (MIT)',
     description='Change management for Agresso systems',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English'
