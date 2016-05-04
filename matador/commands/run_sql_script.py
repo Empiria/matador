@@ -32,7 +32,7 @@ def _command(**kwargs):
         ],
         ('mssql', 'nt'): [
             'sqlcmd', '-S', kwargs['server'],
-            '-D', kwargs['db_name'], '-U', kwargs['user'],
+            '-d', kwargs['db_name'], '-U', kwargs['user'],
             '-P', kwargs['password']
         ],
     }
