@@ -8,6 +8,17 @@ from matador.session import Session
 
 
 def _command(**kwargs):
+    """
+    Parameters
+    ----------
+    kwargs : dict
+        A dictionary containing values for:
+            user
+            password
+            server
+            port (optional, for Oracle only)
+            db_name
+    """
     oracle_connection = Template(
         '${user}/${password}@${server}:${port}/${db_name}')
 
@@ -31,6 +42,15 @@ def _command(**kwargs):
 
 
 def _sql_script(**kwargs):
+    """
+    Parameters
+    ----------
+    kwargs : dict
+        A dictionary containing values for:
+            dbms
+            directory
+            file
+    """
     file = Path(kwargs['directory'], kwargs['file'])
 
     with file.open('r') as f:
@@ -44,6 +64,17 @@ def _sql_script(**kwargs):
 
 
 def run_sql_script(logger, **kwargs):
+    """
+    Parameters
+    ----------
+    kwargs : dict
+        A dictionary containing values for:
+            dbms
+            server
+            db_name
+            directory
+            file
+    """
     message = Template(
         'Matador: Executing ${file} against ${db_name} on ${server} \n')
     logger.info(message.substitute(kwargs))

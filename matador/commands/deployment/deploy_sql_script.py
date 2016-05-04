@@ -37,7 +37,15 @@ class DeploySqlScript(DeploymentCommand):
             script = _fetch_script(
                 Session.matador_repo, path, commit, Session.deployment_folder)
 
-        run_sql_script(self._logger, str(script))
+        kwargs = {
+            **Session.environment['database'],
+            **Session.credentials
+        }
+
+        kwargs['directory'] = str(script.parent)
+        kwargs['file'] = str(script.name)
+
+        run_sql_script(self._logger, **kwargs)
 
 
 class DeployOraclePackage(DeploymentCommand):
