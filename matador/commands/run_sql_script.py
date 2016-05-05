@@ -1,10 +1,45 @@
 #!/usr/bin/env python
 from pathlib import Path
+from collections import defaultdict
 import os
 import subprocess
 from string import Template
 from .command import Command
 from matador.session import Session
+
+
+def _command_condition(*args):
+    """
+
+    Parameters
+    ----------
+    args: list
+        containing boolean values for:
+            if a command has been specified explicitly
+            if the dbms is oracle
+            if the os is posix
+            if windows authentication has been specified
+
+    Returns
+    -------
+        tuple of values which can be used to determine the appropriate command
+        to run an sql script
+
+    """
+    try:
+        most_significant_argument = args.index(True)
+    except ValueError:
+        most_significant_argument = -1
+
+    conditions = {
+        0: ('command'),
+        1: ('oracle'),
+        2: ('mssql', 'posix'),
+        3: ('mssql', 'nt', 'windows_authentication'),
+        -1: ('mssql', 'nt', 'mssql_authentication')
+    }
+
+    return conditions[most_significant_argument]
 
 
 def _command(**kwargs):
@@ -13,32 +48,40 @@ def _command(**kwargs):
     ----------
     kwargs : dict
         A dictionary containing values for:
+            command (optional, overrides all other entries)
+            dbms
+            client_os
+            server
+            db_name
+            port (Oracle only)
+            windows_authentication (MSSQL on windows clients only)
             user
             password
-            server
-            port (optional, for Oracle only)
-            db_name
     """
-    oracle_connection = Template(
-        '${user}/${password}@${server}:${port}/${db_name}')
+    command_condition = _command_condition(
+        'command' in kwargs,
+        kwargs['dbms'].lower() == 'oracle',
+        kwargs['client_os'] == 'posix',
+        'windows_authentication' in kwargs)
+
+    # Create a default dictionary based on kwargs but with any missing
+    # keys returning an empty string.
+    params = defaultdict(str, kwargs)
 
     commands = {
-        ('oracle', 'nt'): [
-            'sqlplus', '-S', '-L', oracle_connection.substitute(kwargs)],
-        ('mssql', 'posix'): [
-            'bsqldb', '-S', kwargs['server'],
-            '-D', kwargs['db_name'], '-U', kwargs['user'],
-            '-P', kwargs['password']
-        ],
-        ('mssql', 'nt'): [
-            'sqlcmd', '-S', kwargs['server'],
-            '-d', kwargs['db_name'], '-U', kwargs['user'],
-            '-P', kwargs['password']
-        ],
+        ('command'):
+            params['command'],
+        ('oracle'):
+            'sqlplus -S -L ${user}/${password}@${server}:${port}/${db_name}',
+        ('mssql', 'posix'):
+            'bsqldb -S ${server} -D ${db_name} -U ${user} -P ${password}',
+        ('mssql', 'nt', 'windows_authentication'):
+            'sqlcmd -S ${server} -d ${db_name} -E',
+        ('mssql', 'nt', 'mssql_authentication'):
+            'sqlcmd -S ${server} -d ${db_name} -U ${user} -P ${password}'
     }
-    commands[('oracle', 'posix')] = commands[('oracle', 'nt')]
 
-    return commands[(kwargs['dbms'], os.name)]
+    return Template(commands[command_condition]).substitute(params)
 
 
 def _sql_script(**kwargs):
@@ -78,11 +121,12 @@ def run_sql_script(logger, **kwargs):
     message = Template(
         'Matador: Executing ${file} against ${db_name} on ${server} \n')
     logger.info(message.substitute(kwargs))
+    kwargs['client_os'] = os.name
 
     os.chdir(kwargs['directory'])
 
     process = subprocess.Popen(
-        _command(**kwargs),
+        _command(**kwargs).split(),
         stdin=subprocess.PIPE)
     process.stdin.write(_sql_script(**kwargs))
     process.stdin.close()
