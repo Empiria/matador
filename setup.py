@@ -27,6 +27,7 @@ setup(
     },
     url='http://www.empiria.co.uk',
     packages=find_packages('src'),
+    package_dir={'': 'src'},
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     install_requires=['pyyaml', 'dulwich', 'openpyxl', 'cookiecutter'],
