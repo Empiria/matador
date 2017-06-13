@@ -36,5 +36,6 @@ setup(
         'Environment :: Console',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English'
-    ]
+    ],
+    python_requires='>=3.6',
 )
