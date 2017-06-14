@@ -54,11 +54,12 @@ def deploy_report_file(report_name, report_file_name, commit_ref):
         Session.matador_repository_folder, 'src', 'reports', report_name,
         report_file_name)
     deployment_file = Path(Session.deployment_folder, report_file_name)
-    target_folder = Path(
-        '//', Session.environment['abwServer'],
-        Session.environment['customisedReports'])
+    target_folder = (
+            '//' +
+            Session.environment['abwServer'] + '/' +
+            Session.environment['customisedReports'])
     git.checkout(Session.matador_repo, commit_ref)
     create_deployment_file[source_file.suffix](
         source_file, deployment_file, commit_ref)
     logger.info(f'Deploying {report_file_name} to {target_folder}')
-    shutil.copy(str(deployment_file), str(target_folder))
+    shutil.copy(str(deployment_file), target_folder)
