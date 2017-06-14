@@ -27,12 +27,13 @@ def _fetch_script(repo, script_path, commit_ref, target_folder):
 
 
 def deploy_sql_script(path, commit_ref):
-
-    if str(path.parent) == '.':
-        script = Path(Session.deployment_folder, path)
+    script_path = Path(path)
+    if str(script_path.parent) == '.':
+        script = Path(Session.deployment_folder, script_path)
     else:
         script = _fetch_script(
-            Session.matador_repo, path, commit_ref, Session.deployment_folder)
+            Session.matador_repo, script_path, commit_ref,
+            Session.deployment_folder)
 
     kwargs = {
         **Session.environment['database'],
