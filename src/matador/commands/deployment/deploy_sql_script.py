@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import logging
 from pathlib import Path
 from matador.session import Session
 from .deployment import DeploymentCommand
@@ -25,47 +26,40 @@ def _fetch_script(repo, script_path, commit_ref, target_folder):
     return target_script
 
 
-class DeploySqlScript(DeploymentCommand):
+def deploy_sql_script(path, commit_ref):
 
-    def _execute(self):
-        path = Path(self.args[0])
+    if str(path.parent) == '.':
+        script = Path(Session.deployment_folder, path)
+    else:
+        script = _fetch_script(
+            Session.matador_repo, path, commit_ref, Session.deployment_folder)
 
-        if str(path.parent) == '.':
-            script = Path(Session.deployment_folder, path)
-        else:
-            commit = self.args[1]
-            script = _fetch_script(
-                Session.matador_repo, path, commit, Session.deployment_folder)
+    kwargs = {
+        **Session.environment['database'],
+        **Session.credentials
+    }
 
-        kwargs = {
-            **Session.environment['database'],
-            **Session.credentials
-        }
+    kwargs['directory'] = str(script.parent)
+    kwargs['file'] = str(script.name)
 
-        kwargs['directory'] = str(script.parent)
-        kwargs['file'] = str(script.name)
-
-        run_sql_script(self._logger, **kwargs)
+    logger = logging.getLogger(__name__)
+    run_sql_script(logger, **kwargs)
 
 
-class DeployOraclePackage(DeploymentCommand):
+def deploy_oracle_package(package_name, commit_ref):
+    repo_folder = Session.matador_repository_folder
+    package_folder = Path(
+        repo_folder, 'src', 'db_objects', 'packages', package_name)
+    package_spec = Path(package_folder, package_name + '.pks')
+    package_body = Path(package_folder, package_name + '.pkb')
 
-    def _execute(self):
-        package_name = self.args[0]
-        commit = self.args[1]
+    spec_script = _fetch_script(
+        Session.matador_repo, package_spec, commit_ref,
+        Session.deployment_folder)
+    body_script = _fetch_script(
+        Session.matador_repo, package_body, commit_ref,
+        Session.deployment_folder)
 
-        repo_folder = Session.matador_repository_folder
-        package_folder = Path(
-            repo_folder, 'src', 'db_objects', 'packages', package_name)
-        package_spec = Path(package_folder, package_name + '.pks')
-        package_body = Path(package_folder, package_name + '.pkb')
-
-        spec_script = _fetch_script(
-            Session.matador_repo, package_spec, commit,
-            Session.deployment_folder)
-        body_script = _fetch_script(
-            Session.matador_repo, package_body, commit,
-            Session.deployment_folder)
-
-        run_sql_script(self._logger, spec_script)
-        run_sql_script(self._logger, body_script)
+    logger = logging.getLogger(__name__)
+    run_sql_script(logger, spec_script)
+    run_sql_script(logger, body_script)

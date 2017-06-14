@@ -54,10 +54,14 @@ def deploy_report_file(report_name, report_file_name, commit_ref):
         Session.matador_repository_folder, 'src', 'reports', report_name,
         report_file_name)
     deployment_file = Path(Session.deployment_folder, report_file_name)
+
+    # I've been unable to get UNC shares working as Path objects, so I'm
+    # using a simple string here. Also, that's what shutil requires anyway.
     target_folder = (
             '//' +
             Session.environment['abwServer'] + '/' +
             Session.environment['customisedReports'])
+
     git.checkout(Session.matador_repo, commit_ref)
     create_deployment_file[source_file.suffix](
         source_file, deployment_file, commit_ref)
