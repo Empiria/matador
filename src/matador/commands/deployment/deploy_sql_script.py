@@ -27,6 +27,9 @@ def _fetch_script(repo, script_path, commit_ref, target_folder):
 
 
 def deploy_sql_script(path, commit_ref):
+    """Checkout an sql script from the matador repo and execute it against
+    the database server defined for the environment.
+    """
     script_path = Path(path)
     if str(script_path.parent) == '.':
         script = Path(Session.deployment_folder, script_path)
@@ -48,6 +51,9 @@ def deploy_sql_script(path, commit_ref):
 
 
 def deploy_oracle_package(package_name, commit_ref):
+    """Checkout the scripts for a package body and spec and execute them
+    against the database server defined for the environment.
+    """
     repo_folder = Session.matador_repository_folder
     package_folder = Path(
         repo_folder, 'src', 'db_objects', 'packages', package_name)
