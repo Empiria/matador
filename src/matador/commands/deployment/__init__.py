@@ -1,2 +1,2 @@
 from .deploy_sql_script import DeploySqlScript, DeployOraclePackage
-from .deploy_report import DeployExceleratorReport, DeployReportFile
+from .deploy_report import deploy_report_file

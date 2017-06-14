@@ -1,87 +1,64 @@
+import logging
 from pathlib import Path
 from matador.session import Session
-from .deployment import DeploymentCommand
 from matador import git
 from matador import zippey
 import shutil
 from openpyxl import load_workbook
 
 
-def _fetch_report_file(repo, report_path, commit_ref, target_folder):
-    report = Path(repo.path, report_path)
-    target_report = Path(target_folder, report.name)
-    version, commit_timestamp, author = git.keyword_values(repo, commit_ref)
+def _create_deployment_xlsx_file(source_file, deployment_file, commit_ref):
+    """Copy a source .xlsx file to the deployment folder and add git info its
+    file properties.
+    """
+    version, commit_timestamp, author = git.keyword_values(
+        Session.matador_repo, commit_ref)
 
-    git.checkout(repo, commit_ref)
+    deployment_file.touch()
+    zippey.decode(source_file.open('rb'), deployment_file.open('wb'))
 
-    with report.open('r') as f:
-        original_text = f.read()
-        f.close()
-
-    new_text = git.substitute_keywords(original_text, repo, commit_ref)
-
-    with target_report.open('w') as f:
-        f.write(new_text)
-        f.close()
-
-    return target_report
-
-
-def _fetch_excelerator_report(repo, report_path, commit_ref, target_folder):
-    report = Path(repo.path, report_path)
-    target_report = Path(target_folder, report.name)
-    version, commit_timestamp, author = git.keyword_values(repo, commit_ref)
-
-    git.checkout(repo, commit_ref)
-
-    target_report.touch()
-    zippey.decode(report.open('rb'), target_report.open('wb'))
-
-    workbook = load_workbook(str(target_report))
+    workbook = load_workbook(str(deployment_file))
     workbook.properties.creator = author
     workbook.properties.version = version
-    workbook.save(str(target_report))
-
-    return target_report
+    workbook.save(str(deployment_file))
 
 
-class DeployExceleratorReport(DeploymentCommand):
+def _create_deployment_text_file(source_file, deployment_file, commit_ref):
+    """Copy a source text file to the deployment folder and perform git keyword
+    substitution on the copy.
+    """
+    with source_file.open('r') as f:
+        original_text = f.read()
 
-    def _execute(self):
-        report_name = Path(self.args[0])
-        repo_folder = Session.matador_repository_folder
-        report_path = Path(
-            repo_folder, 'src', 'reports', report_name,
-            str(report_name) + '.xlsx')
+    new_text = git.substitute_keywords(
+        original_text, Session.matador_repo, commit_ref)
 
-        commit = self.args[1]
-        report = _fetch_excelerator_report(
-            Session.matador_repo, report_path, commit,
-            Session.deployment_folder)
-        target_folder = (
-            '//' +
-            Session.environment['abwServer'] + '/' +
-            Session.environment['customisedReports'])
-
-        shutil.copy(str(report), target_folder)
+    with deployment_file.open('w') as f:
+        f.write(new_text)
 
 
-class DeployReportFile(DeploymentCommand):
+create_deployment_file = {
+    '.xlsx': _create_deployment_xlsx_file,
+    '.arw': _create_deployment_text_file,
+    '.rpx': _create_deployment_text_file,
+}
 
-    def _execute(self):
-        report_name = Path(self.args[0])
-        report_file_name = Path(self.args[1])
-        repo_folder = Session.matador_repository_folder
-        report_path = Path(
-            repo_folder, 'src', 'reports', report_name, report_file_name)
 
-        commit = self.args[2]
-        report = _fetch_report_file(
-            Session.matador_repo, report_path, commit,
-            Session.deployment_folder)
-        target_folder = (
-            '//' +
-            Session.environment['abwServer'] + '/' +
-            Session.environment['customisedReports'])
-
-        shutil.copy(str(report), target_folder)
+def deploy_report_file(report_name, report_file_name, commit_ref):
+    """Checkout a report file from the matador repo, copy it to the deployment
+    folder, add git keywords to the copy and deploy the result to the ABW
+    Customised Reports folder.
+    """
+    logger = logging.getLogger(__name__)
+    source_file = Path(
+        Session.matador_repository_folder, 'src', 'reports', report_name,
+        report_file_name)
+    deployment_file = Path(Session.deployment_folder, report_file_name)
+    target_folder = Path(
+        '//', Session.environment['abwServer'],
+        Session.environment['customisedReports'])
+    git.checkout(Session.matador_repo, commit_ref)
+    create_deployment_file[source_file.suffix](
+        source_file, deployment_file, commit_ref)
+    logger.info(f'Deploying {report_file_name} to {target_folder}')
+    shutil.copy(str(deployment_file), str(target_folder))
