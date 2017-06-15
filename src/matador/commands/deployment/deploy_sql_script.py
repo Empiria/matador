@@ -2,7 +2,6 @@
 import logging
 from pathlib import Path
 from matador.session import Session
-from .deployment import DeploymentCommand
 from matador.commands.run_sql_script import run_sql_script
 from matador import git
 
@@ -26,7 +25,7 @@ def _fetch_script(repo, script_path, commit_ref, target_folder):
     return target_script
 
 
-def deploy_sql_script(path, commit_ref):
+def deploy_sql_script(path, commit_ref=None):
     """Checkout an sql script from the matador repo and execute it against
     the database server defined for the environment.
     """
@@ -50,7 +49,7 @@ def deploy_sql_script(path, commit_ref):
     run_sql_script(logger, **kwargs)
 
 
-def deploy_oracle_package(package_name, commit_ref):
+def deploy_oracle_package(package_name, commit_ref=None):
     """Checkout the scripts for a package body and spec and execute them
     against the database server defined for the environment.
     """

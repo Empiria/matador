@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from matador.session import Session
 from matador import git
@@ -58,12 +59,27 @@ def deploy_report_file(report_name, report_file_name, commit_ref):
     # I've been unable to get UNC shares working as Path objects, so I'm
     # using a simple string here. Also, that's what shutil requires anyway.
     target_folder = (
-            '//' +
-            Session.environment['abwServer'] + '/' +
-            Session.environment['customisedReports'])
+        '//' +
+        Session.environment['abwServer'] + '/' +
+        Session.environment['customisedReports'])
 
     git.checkout(Session.matador_repo, commit_ref)
     create_deployment_file[source_file.suffix](
         source_file, deployment_file, commit_ref)
     logger.info(f'Deploying {report_file_name} to {target_folder}')
     shutil.copy(str(deployment_file), target_folder)
+
+
+def remove_report_file(report_file_name):
+    """Remove a report file from the ABW Customised Reports Folder"""
+    logger = logging.getLogger(__name__)
+    target_folder = (
+        '//' +
+        Session.environment['abwServer'] + '/' +
+        Session.environment['customisedReports'])
+    target_file = target_folder + '/' + report_file_name
+    logger.info(f'Removing {report_file_name} from {target_folder}')
+    try:
+        os.remove(target_file)
+    except FileNotFoundError:
+        logger.warning(f'{report_file_name} does not exist in {target_folder}')

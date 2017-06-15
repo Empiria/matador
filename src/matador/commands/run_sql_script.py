@@ -96,7 +96,7 @@ def _sql_script(**kwargs):
     """
     file = Path(kwargs['directory'], kwargs['file'])
 
-    with file.open('r') as f:
+    with file.open('r', encoding='utf8') as f:
         script = f.read()
         f.close()
 
