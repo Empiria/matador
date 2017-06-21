@@ -1,14 +1,11 @@
-#!/usr/bin/env python
 from pathlib import Path
 from collections import defaultdict
 import os
 import subprocess
 from string import Template
-from .command import Command
-from matador.session import Session
 
 
-def _command_condition(*args):
+def command_condition(*args):
     """
 
     Parameters
@@ -42,7 +39,7 @@ def _command_condition(*args):
     return conditions[most_significant_argument]
 
 
-def _command(**kwargs):
+def command(**kwargs):
     """
     Parameters
     ----------
@@ -58,7 +55,7 @@ def _command(**kwargs):
             user
             password
     """
-    command_condition = _command_condition(
+    condition = command_condition(
         'command' in kwargs,
         kwargs['dbms'].lower() == 'oracle',
         kwargs['client_os'] == 'posix',
@@ -81,10 +78,10 @@ def _command(**kwargs):
             'sqlcmd -S ${server} -d ${db_name} -U ${user} -P ${password}'
     }
 
-    return Template(commands[command_condition]).substitute(params)
+    return Template(commands[condition]).substitute(params)
 
 
-def _sql_script(**kwargs):
+def sql_script(**kwargs):
     """
     Parameters
     ----------
@@ -106,7 +103,7 @@ def _sql_script(**kwargs):
     return script.encode('utf-8')
 
 
-def run_sql_script(logger, **kwargs):
+def run_sql_script(**kwargs):
     """
     Parameters
     ----------
@@ -118,47 +115,16 @@ def run_sql_script(logger, **kwargs):
             directory
             file
     """
-    message = Template(
-        'Matador: Executing ${file} against ${db_name} on ${server} \n')
-    logger.info(message.substitute(kwargs))
     kwargs['client_os'] = os.name
+    cwd = os.getcwd()
 
     os.chdir(kwargs['directory'])
 
     process = subprocess.Popen(
-        _command(**kwargs).split(),
+        command(**kwargs).split(),
         stdin=subprocess.PIPE)
-    process.stdin.write(_sql_script(**kwargs))
+    process.stdin.write(sql_script(**kwargs))
     process.stdin.close()
     process.wait()
 
-
-class RunSqlScript(Command):
-
-    def _add_arguments(self, parser):
-
-        parser.add_argument(
-            '-d', '--directory',
-            type=str,
-            required=True,
-            help='Directory containing script')
-
-        parser.add_argument(
-            '-f', '--file',
-            type=str,
-            required=True,
-            help='Script file name')
-
-        parser.add_argument(
-            '-e', '--environment',
-            type=str,
-            required=True,
-            help='Agresso environment')
-
-    def _execute(self):
-        Session.set_environment(self.args.environment)
-        kwargs = {
-            **Session.environment['database'],
-            **Session.credentials,
-            **self.args.__dict__}
-        run_sql_script(self._logger, **kwargs)
+    os.chdir(cwd)

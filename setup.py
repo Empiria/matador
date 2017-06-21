@@ -17,7 +17,7 @@ setup(
     author_email='owen.campbell@empiria.co.uk',
     entry_points={
         'console_scripts': [
-            'matador = matador.management:execute_command',
+            'matador = matador.cli.commands:matador',
         ],
     },
     options={
@@ -30,7 +30,8 @@ setup(
     package_dir={'': 'src'},
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
-    install_requires=['pyyaml', 'dulwich', 'openpyxl', 'cookiecutter'],
+    install_requires=[
+        'click', 'pyyaml', 'dulwich', 'openpyxl', 'cookiecutter'],
     license='The MIT License (MIT)',
     description='Change management for Agresso systems',
     classifiers=[

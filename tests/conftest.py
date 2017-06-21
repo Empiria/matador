@@ -5,20 +5,11 @@ from dulwich.errors import NotGitRepository
 from dulwich.repo import Repo
 import yaml
 from os import chdir
-from matador.session import Session
 from globals import project, credentials, environments
 
 
-@pytest.fixture
-def session(request):
-
-    def finalise():
-        Session.clear()
-    request.addfinalizer(finalise)
-
-
-@pytest.fixture
-def repo(tmpdir, request):
+@pytest.fixture()
+def repo(tmpdir):
     repo_folder = Path(str(tmpdir), project)
     try:
         repo = Repo(str(repo_folder))
@@ -32,8 +23,8 @@ def repo(tmpdir, request):
     return repo
 
 
-@pytest.fixture
-def project_repo(tmpdir, request, repo, session):
+@pytest.fixture()
+def project_repo(request, repo):
     repo_folder = Path(repo.path)
 
     def finalise():
