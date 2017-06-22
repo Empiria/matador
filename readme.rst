@@ -17,5 +17,8 @@ Documentation at http://matador.readthedocs.org/
 * Capture the full history of changes to those scripts within a modern
   version control system
 
+* Store the details for all your ABW environments in one place and share those
+  across your entire development team
+
 * Deploy changes to any number of ABW environments with complete confidence
   that the end effect is identical
