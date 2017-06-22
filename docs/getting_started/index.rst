@@ -1,7 +1,7 @@
-.. getting_started:
+.. quickstart:
 
-Getting Started
-===============
+Quick Start
+===========
 
 
 Contents:
@@ -9,4 +9,4 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   getting_started.rst
+   quickstart.rst
