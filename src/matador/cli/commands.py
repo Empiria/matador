@@ -11,15 +11,21 @@ import matador.cli.utils as utils
 from matador import git, zippey
 
 
-@click.version_option(message='%(prog)s version %(version)s')
+@click.version_option(message='%(prog)s %(version)s :: Empiria Ltd')
 @click.group()
 def matador():
     pass
 
 
 @matador.command(name='init')
-@click.option('--project', '-p', prompt='Project Name')
+@click.option('--project', '-p', prompt='Project Name', help='Project Name')
 def create_project(project):
+    """Create the folder structure for a new matador project
+
+    A new folder will be created beneath the current working folder, using the
+    project name provided, and the matador folder structure will reside beneath
+    that.
+    """
     cookiecutter(
         'https://github.com/Empiria/matador-cookiecutter.git',
         no_input=True,
@@ -28,8 +34,10 @@ def create_project(project):
 
 
 @matador.command(name='create-ticket')
-@click.option('--ticket', '-t', prompt='Ticket')
+@click.option('--ticket', '-t', prompt='Ticket', help='Ticket Name')
 def create_ticket(ticket):
+    """Create the folder, deployment and removal files for a ticket beneath
+    the project's 'deploy' folder and commit that change."""
     project_repo = Repo.discover()
     ticket_folder = Path(project_repo.path, 'deploy', 'tickets', ticket)
     Path.mkdir(ticket_folder, parents=True, exist_ok=True)
@@ -45,8 +53,10 @@ def create_ticket(ticket):
 
 
 @matador.command(name='create-package')
-@click.option('--package', '-p', prompt='Package')
+@click.option('--package', '-p', prompt='Package', help='Package Name')
 def create_package(package):
+    """Create the folder and definition file for a package beneath the
+    project's 'deploy' folder and commit that change."""
     project_repo = Repo.discover()
     package_folder = Path(project_repo.path, 'deploy', 'packages', package)
     Path.mkdir(package_folder, parents=True, exist_ok=True)
@@ -69,9 +79,11 @@ def create_package(package):
 
 
 @matador.command(name='add-t2p')
-@click.option('--ticket', '-t', prompt='Ticket')
-@click.option('--package', '-p', prompt='Package')
+@click.option('--ticket', '-t', prompt='Ticket', help='Ticket Name')
+@click.option('--package', '-p', prompt='Package', help='Package Name')
 def add_ticket_to_package(ticket, package):
+    """Add a ticket to the definition file for a package and commit that
+    change."""
     project_repo = Repo.discover()
     package_file = Path(
         project_repo.path, 'deploy', 'packages', package, 'tickets.yml')
@@ -85,12 +97,15 @@ def add_ticket_to_package(ticket, package):
 
 
 @matador.command(name='deploy-ticket')
-@click.option('--environment', '-e', prompt='Environment')
-@click.option('--ticket', '-t', prompt='Ticket')
-@click.option('--commit', '-c', default=None)
+@click.option(
+    '--environment', '-e', prompt='Environment', help='Environment Name')
+@click.option('--ticket', '-t', prompt='Ticket', help='Ticket Name')
+@click.option('--commit', '-c', default=None, help='Commit Reference')
 @click.option('--packaged', '-p', is_flag=True, default=False)
 @deploys_changes
 def deploy_ticket(environment, ticket, commit, packaged):
+    """Excecute the deployment file for the given ticket against the given
+    environment."""
     click.echo(f'Deploying ticket {ticket} to {environment}')
     deployment_folder = utils.ticket_deployment_folder(
         environment, ticket, commit, packaged)
@@ -99,12 +114,15 @@ def deploy_ticket(environment, ticket, commit, packaged):
 
 
 @matador.command(name='remove-ticket')
-@click.option('--ticket', '-t', prompt='Ticket')
-@click.option('--environment', '-e', prompt='Environment')
-@click.option('--commit', '-c', default=None)
+@click.option(
+    '--environment', '-e', prompt='Environment', help='Environment Name')
+@click.option('--ticket', '-t', prompt='Ticket', help='Ticket Name')
+@click.option('--commit', '-c', default=None, help='Commit Reference')
 @click.option('--packaged', '-p', is_flag=True, default=False)
 @deploys_changes
 def remove_ticket(environment, ticket, commit, packaged):
+    """Excecute the removal file for the given ticket against the given
+    environment."""
     click.echo(f'Removing ticket {ticket} from {environment}')
     deployment_folder = utils.ticket_deployment_folder(
         environment, ticket, commit, packaged)
@@ -113,10 +131,13 @@ def remove_ticket(environment, ticket, commit, packaged):
 
 
 @matador.command(name='deploy-package')
-@click.option('--environment', '-e', prompt='Environment')
-@click.option('--package', '-p', prompt='Package')
-@click.option('--commit', '-c', prompt='Commit Ref')
+@click.option(
+    '--environment', '-e', prompt='Environment', help='Environment Name')
+@click.option('--package', '-p', prompt='Package', help='Package Name')
+@click.option('--commit', '-c', prompt='Commit Ref', help='Commit Reference')
 def deploy_package(environment, package, commit):
+    """Execute the deployment file for each ticket listed in the definition
+    file for the given package."""
     click.echo(f'Deploying package {package} to {environment}')
     tickets_file = utils.package_definition(environment, package, commit)
     with tickets_file.open('r') as f:
@@ -131,10 +152,13 @@ def deploy_package(environment, package, commit):
 
 
 @matador.command(name='remove-package')
-@click.option('--environment', '-e', prompt='Environment')
-@click.option('--package', '-p', prompt='Package')
-@click.option('--commit', '-c', prompt='Commit Ref')
+@click.option(
+    '--environment', '-e', prompt='Environment', help='Environment Name')
+@click.option('--package', '-p', prompt='Package', help='Package Name')
+@click.option('--commit', '-c', prompt='Commit Ref', help='Commit Reference')
 def remove_package(environment, package, commit):
+    """Execute the removal file for each ticket listed in the definition
+    file for the given package."""
     click.echo(f'Removing package {package} from {environment}')
     tickets_file = utils.package_definition(environment, package, commit)
     with tickets_file.open('r') as f:
@@ -149,10 +173,13 @@ def remove_package(environment, package, commit):
 
 
 @matador.command(name='run-sql-script')
-@click.option('--environment', '-e', prompt='Environment')
+@click.option(
+    '--environment', '-e', prompt='Environment', help='Environment Name')
 @click.argument('file', type=click.File('r'))
 @deploys_changes
 def run_sql_script(environment, file):
+    """Execute the given sql script against the database defined for the given
+    environment."""
     click.echo(f'Executing {file} against {environment}')
     kwargs = {
         **utils.environment()[environment]['database'],
@@ -184,10 +211,13 @@ def clean_zip(input, output):
 
 
 @matador.command(name='start-service')
-@click.option('--environment', '-e', prompt='Environment')
-@click.option('--service', '-s', prompt='Service')
+@click.option(
+    '--environment', '-e', prompt='Environment', help='Environment Name')
+@click.option('--service', '-s', prompt='Service', help='Service Label')
 @windows_only
 def start_service(environment, service):
+    """Start the given service on the ABW Server defined for the given
+    environment."""
     click.echo(f'Starting {service} on {environment}')
     from matador.cli import abw_service
     services = utils.environment()[environment]['services']
@@ -195,10 +225,13 @@ def start_service(environment, service):
 
 
 @matador.command(name='restart-service')
-@click.option('--environment', '-e', prompt='Environment')
-@click.option('--service', '-s', prompt='Service')
+@click.option(
+    '--environment', '-e', prompt='Environment', help='Environment Name')
+@click.option('--service', '-s', prompt='Service', help='Service Label')
 @windows_only
 def restart_service(environment, service):
+    """Restart the given service on the ABW Server defined for the given
+    environment."""
     click.echo(f'Restarting {service} on {environment}')
     from matador.cli import abw_service
     services = utils.environment()[environment]['services']
@@ -206,10 +239,13 @@ def restart_service(environment, service):
 
 
 @matador.command(name='stop-service')
-@click.option('--environment', '-e', prompt='Environment')
-@click.option('--service', '-s', prompt='Service')
+@click.option(
+    '--environment', '-e', prompt='Environment', help='Environment Name')
+@click.option('--service', '-s', prompt='Service', help='Service Label')
 @windows_only
 def stop_service(environment, service):
+    """Stop the given service on the ABW Server defined for the given
+    environment."""
     click.echo(f'Stopping {service} on {environment}')
     from matador.cli import abw_service
     services = utils.environment()[environment]['services']
@@ -217,10 +253,13 @@ def stop_service(environment, service):
 
 
 @matador.command(name='service-status')
-@click.option('--environment', '-e', prompt='Environment')
-@click.option('--service', '-s', prompt='Service')
+@click.option(
+    '--environment', '-e', prompt='Environment', help='Environment Name')
+@click.option('--service', '-s', prompt='Service', help='Service Label')
 @windows_only
 def service_status(environment, service):
+    """Report the status of the given service on the ABW Server defined for the
+    given environment."""
     from matador.cli import abw_service
     services = utils.environment()[environment]['services']
     is_running = abw_service.is_running(services[service])

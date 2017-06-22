@@ -13,8 +13,8 @@ except LookupError:
 setup(
     name='Matador',
     version='4.0.0',
-    author='Owen Campbell',
-    author_email='owen.campbell@empiria.co.uk',
+    author='Empiria Ltd',
+    author_email='info@empiria.co.uk',
     entry_points={
         'console_scripts': [
             'matador = matador.cli.commands:matador',
