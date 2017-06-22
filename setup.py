@@ -12,7 +12,7 @@ except LookupError:
 
 setup(
     name='Matador',
-    version='4.0.0',
+    version='4.0.1',
     author='Empiria Ltd',
     author_email='info@empiria.co.uk',
     entry_points={
