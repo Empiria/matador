@@ -4,6 +4,11 @@ Changelog
 Unreleased
 ----------
 
+v4.0.1 (2017-06-22)
+-------------------
+
+* Enhancement: Each command and its options now have help text available
+
 
 v4.0.0 (2017-06-21)
 -------------------
