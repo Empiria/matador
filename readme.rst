@@ -7,6 +7,15 @@
 Matador
 =======
 
-A change management tool for Agresso systems.
+A change management tool for Unit4 Business World (formerly Agresso Business
+World) systems.
 
 Documentation at http://matador.readthedocs.org/
+
+* Represent all changes to your system as scripts within a matador project
+
+* Capture the full history of changes to those scripts within a modern
+  version control system
+
+* Deploy changes to any number of ABW environments with complete confidence
+  that the end effect is identical
