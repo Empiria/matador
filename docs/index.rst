@@ -11,9 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   getting_started/index.rst
+   quickstart/index.rst
    tutorial/index.rst
-   reference/index.rst
 
 
 
