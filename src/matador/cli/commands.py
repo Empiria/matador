@@ -8,6 +8,7 @@ from importlib.machinery import SourceFileLoader
 from cookiecutter.main import cookiecutter
 from matador.cli.decorators import windows_only, deploys_changes
 import matador.cli.utils as utils
+from matador.cli import sql
 from matador import git, zippey
 
 
@@ -182,12 +183,14 @@ def run_sql_script(environment, file):
     environment."""
     click.echo(f'Executing {file} against {environment}')
     kwargs = {
-        **utils.environment()[environment]['database'],
+        **utils.environments()[environment]['database'],
         **utils.credentials()[environment]
     }
-    kwargs['directory'] = str(Path(file).parent),
-    kwargs['file'] = str(Path(file).name)
-    run_sql_script(**kwargs)
+    kwargs['directory'] = str(Path(file.name).parent)
+    click.echo(kwargs['directory'])
+    # kwargs['file'] = str(Path(str(file)).name)
+    kwargs['file'] = file.name
+    sql.run_sql_script(**kwargs)
 
 
 @matador.command(name='smudge-zip')
