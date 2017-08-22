@@ -181,14 +181,12 @@ def remove_package(environment, package, commit):
 def run_sql_script(environment, file):
     """Execute the given sql script against the database defined for the given
     environment."""
-    click.echo(f'Executing {file} against {environment}')
+    click.echo(f'Executing {file.name} against {environment}')
     kwargs = {
         **utils.environments()[environment]['database'],
         **utils.credentials()[environment]
     }
     kwargs['directory'] = str(Path(file.name).parent)
-    click.echo(kwargs['directory'])
-    # kwargs['file'] = str(Path(str(file)).name)
     kwargs['file'] = file.name
     sql.run_sql_script(**kwargs)
 
