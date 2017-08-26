@@ -78,12 +78,12 @@
 # Modified for inclusion within matador
 # by Owen Campbell 23 Feb 2016
 
-import zipfile
-import sys
 import base64
-import string
-import tempfile
 import os.path
+import string
+import sys
+import tempfile
+import zipfile
 
 DEBUG_ZIPPEY = False
 NAME = 'Zippey'

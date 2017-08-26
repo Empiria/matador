@@ -1,7 +1,7 @@
-from pathlib import Path
-from collections import defaultdict
 import os
 import subprocess
+from collections import defaultdict
+from pathlib import Path
 from string import Template
 
 

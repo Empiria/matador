@@ -1,21 +1,33 @@
-import sys
 import io
+from logging import getLogger
+import sys
+from importlib.machinery import SourceFileLoader
+from pathlib import Path
+
 import click
 import yaml
-from dulwich.repo import Repo
-from pathlib import Path
-from importlib.machinery import SourceFileLoader
 from cookiecutter.main import cookiecutter
-from matador.cli.decorators import windows_only, deploys_changes
+from dulwich.repo import Repo
+
 import matador.cli.utils as utils
+from matador import git
+from matador import logging
+from matador import zippey
 from matador.cli import sql
-from matador import git, zippey
+from matador.cli.decorators import deploys_changes
+from matador.cli.decorators import windows_only
+
+logger = getLogger(__name__)
 
 
 @click.version_option(message='%(prog)s %(version)s :: Empiria Ltd')
 @click.group()
-def matador():
-    pass
+@click.option(
+    '--log', '-l', default='console', help='Logging Destination',
+    type=click.Choice(['console', 'file']))
+@click.option('--verbosity', '-v', default='info', help='Logging verbosity')
+def matador(log, verbosity):
+    logging.setup(log, verbosity)
 
 
 @matador.command(name='init')
@@ -31,7 +43,7 @@ def create_project(project):
         'https://github.com/Empiria/matador-cookiecutter.git',
         no_input=True,
         extra_context={'project_name': project})
-    click.echo(f'Created matador project {project}')
+    logger.info(f'Created matador project {project}')
 
 
 @matador.command(name='create-ticket')
@@ -50,7 +62,7 @@ def create_ticket(ticket):
         git.stage_file(project_repo, file)
 
     git.commit(project_repo, f'Create ticket {ticket}')
-    click.echo(f'Created ticket {ticket}')
+    logger.info(f'Created ticket {ticket}')
 
 
 @matador.command(name='create-package')
@@ -76,7 +88,7 @@ def create_package(package):
 
     git.stage_file(project_repo, remove_file)
     git.commit(project_repo, f'Create package {package}')
-    click.echo(f'Created package {package}')
+    logger.info(f'Created package {package}')
 
 
 @matador.command(name='add-t2p')
@@ -94,7 +106,7 @@ def add_ticket_to_package(ticket, package):
 
     git.stage_file(project_repo, package_file)
     git.commit(project_repo, f'Add ticket {ticket} to package {package}')
-    click.echo(f'Added ticket {ticket} to package {package}')
+    logger.info(f'Added ticket {ticket} to package {package}')
 
 
 @matador.command(name='deploy-ticket')
@@ -107,11 +119,14 @@ def add_ticket_to_package(ticket, package):
 def deploy_ticket(environment, ticket, commit, packaged):
     """Excecute the deployment file for the given ticket against the given
     environment."""
-    click.echo(f'Deploying ticket {ticket} to {environment}')
-    deployment_folder = utils.ticket_deployment_folder(
-        environment, ticket, commit, packaged)
-    source_file = Path(deployment_folder, 'deploy.py')
-    SourceFileLoader('deploy', str(source_file)).load_module()
+    logger.info(f'Deploying ticket {ticket} to {environment}')
+    try:
+        deployment_folder = utils.ticket_deployment_folder(
+            environment, ticket, commit, packaged)
+        source_file = Path(deployment_folder, 'deploy.py')
+        SourceFileLoader('deploy', str(source_file)).load_module()
+    except FileNotFoundError:
+        logger.error(f'Cannot find deployment folder/file for ticket {ticket}')
 
 
 @matador.command(name='remove-ticket')
@@ -124,32 +139,43 @@ def deploy_ticket(environment, ticket, commit, packaged):
 def remove_ticket(environment, ticket, commit, packaged):
     """Excecute the removal file for the given ticket against the given
     environment."""
-    click.echo(f'Removing ticket {ticket} from {environment}')
-    deployment_folder = utils.ticket_deployment_folder(
-        environment, ticket, commit, packaged)
-    source_file = Path(deployment_folder, 'remove.py')
-    SourceFileLoader('remove', str(source_file)).load_module()
-
+    logger.info(f'Removing ticket {ticket} from {environment}')
+    try:
+        deployment_folder = utils.ticket_deployment_folder(
+            environment, ticket, commit, packaged)
+        source_file = Path(deployment_folder, 'remove.py')
+        SourceFileLoader('remove', str(source_file)).load_module()
+    except FileNotFoundError:
+        logger.error(f'Cannot find deployment folder/file for ticket {ticket}')
 
 @matador.command(name='deploy-package')
 @click.option(
     '--environment', '-e', prompt='Environment', help='Environment Name')
 @click.option('--package', '-p', prompt='Package', help='Package Name')
-@click.option('--commit', '-c', prompt='Commit Ref', help='Commit Reference')
+@click.option('--commit', '-c', default=None, help='Commit Reference')
 def deploy_package(environment, package, commit):
     """Execute the deployment file for each ticket listed in the definition
     file for the given package."""
-    click.echo(f'Deploying package {package} to {environment}')
-    tickets_file = utils.package_definition(environment, package, commit)
+    logger.info(f'Deploying package {package} to {environment}')
+    try:
+        tickets_file = utils.package_definition(environment, package, commit)
+    except FileNotFoundError:
+        logger.error(
+            f'Cannot find definition folder/file for package {package}')
+        return
+
     with tickets_file.open('r') as f:
         for ticket in yaml.load(f):
-            click.echo('*' * 25)
-            click.echo(f'Deploying ticket {ticket} to {environment}')
-            deployment_folder = utils.ticket_deployment_folder(
-                environment, ticket, commit, True)
-            source_file = Path(deployment_folder, 'deploy.py')
-            SourceFileLoader('deploy', str(source_file)).load_module()
-            click.echo('')
+            logger.info('*' * 25)
+            logger.info(f'Deploying ticket {ticket} to {environment}')
+            try:
+                deployment_folder = utils.ticket_deployment_folder(
+                    environment, ticket, commit, True)
+                source_file = Path(deployment_folder, 'deploy.py')
+                SourceFileLoader('deploy', str(source_file)).load_module()
+            except FileNotFoundError:
+                logger.error(
+                    f'Cannot find deployment folder/file for ticket {ticket}')
 
 
 @matador.command(name='remove-package')
@@ -160,17 +186,26 @@ def deploy_package(environment, package, commit):
 def remove_package(environment, package, commit):
     """Execute the removal file for each ticket listed in the definition
     file for the given package."""
-    click.echo(f'Removing package {package} from {environment}')
-    tickets_file = utils.package_definition(environment, package, commit)
+    logger.info(f'Removing package {package} from {environment}')
+    try:
+        tickets_file = utils.package_definition(environment, package, commit)
+    except FileNotFoundError:
+        logger.error(
+            f'Cannot find definition folder/file for package {package}')
+        return
+
     with tickets_file.open('r') as f:
         for ticket in yaml.load(f):
-            click.echo('*' * 25)
-            click.echo(f'Removing ticket {ticket} from {environment}')
-            deployment_folder = utils.ticket_deployment_folder(
-                environment, ticket, commit, True)
-            source_file = Path(deployment_folder, 'deploy.py')
-            SourceFileLoader('remove', str(source_file)).load_module()
-            click.echo('')
+            logger.info('*' * 25)
+            logger.info(f'Removing ticket {ticket} from {environment}')
+            try:
+                deployment_folder = utils.ticket_deployment_folder(
+                    environment, ticket, commit, True)
+                source_file = Path(deployment_folder, 'deploy.py')
+                SourceFileLoader('remove', str(source_file)).load_module()
+            except FileNotFoundError:
+                logger.error(
+                    f'Cannot find deployment folder/file for ticket {ticket}')
 
 
 @matador.command(name='run-sql-script')
@@ -181,7 +216,7 @@ def remove_package(environment, package, commit):
 def run_sql_script(environment, file):
     """Execute the given sql script against the database defined for the given
     environment."""
-    click.echo(f'Executing {file.name} against {environment}')
+    logger.info(f'Executing {file.name} against {environment}')
     kwargs = {
         **utils.environments()[environment]['database'],
         **utils.credentials()[environment]
@@ -219,7 +254,7 @@ def clean_zip(input, output):
 def start_service(environment, service):
     """Start the given service on the ABW Server defined for the given
     environment."""
-    click.echo(f'Starting {service} on {environment}')
+    logger.info(f'Starting {service} on {environment}')
     from matador.cli import abw_service
     services = utils.environment()[environment]['services']
     abw_service.start(service, services[service])
@@ -233,7 +268,7 @@ def start_service(environment, service):
 def restart_service(environment, service):
     """Restart the given service on the ABW Server defined for the given
     environment."""
-    click.echo(f'Restarting {service} on {environment}')
+    logger.info(f'Restarting {service} on {environment}')
     from matador.cli import abw_service
     services = utils.environment()[environment]['services']
     abw_service.restart(service, services[service])
@@ -247,7 +282,7 @@ def restart_service(environment, service):
 def stop_service(environment, service):
     """Stop the given service on the ABW Server defined for the given
     environment."""
-    click.echo(f'Stopping {service} on {environment}')
+    logger.info(f'Stopping {service} on {environment}')
     from matador.cli import abw_service
     services = utils.environment()[environment]['services']
     abw_service.stop(service, services[service])
@@ -264,4 +299,4 @@ def service_status(environment, service):
     from matador.cli import abw_service
     services = utils.environment()[environment]['services']
     is_running = abw_service.is_running(services[service])
-    click.echo(abw_service.is_running_message(is_running, service))
+    logger.info(abw_service.is_running_message(is_running, service))

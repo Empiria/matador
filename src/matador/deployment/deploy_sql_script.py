@@ -1,10 +1,14 @@
-import click
+import logging
 from pathlib import Path
+
 from dulwich.repo import Repo
-from matador.cli.sql import run_sql_script
-from matador import git
-import matador.session as session
+
 import matador.cli.utils as utils
+import matador.session as session
+from matador import git
+from matador.cli.sql import run_sql_script
+
+logger = logging.getLogger(__name__)
 
 
 def _fetch_script(repo, script_path, commit_ref, target_folder):
@@ -31,7 +35,7 @@ def deploy_sql_script(path, commit_ref=None):
     the database server defined for the environment.
     """
     script_path = Path(path)
-    click.echo(f'Executing {script_path.name} against {session.environment}')
+    logger.info(f'Executing {script_path.name} against {session.environment}')
     project = Path(Repo.discover().path).name
     deployment_folder = Path(
         Path.home(), '.matador', project, session.environment, 'tickets',

@@ -1,11 +1,15 @@
-import click
+from logging import getLogger
 import shutil
-import yaml
-from dulwich.repo import Repo
-from pathlib import Path
-from dulwich.errors import NotGitRepository
 from configparser import ConfigParser
+from pathlib import Path
+
+import yaml
+from dulwich.errors import NotGitRepository
+from dulwich.repo import Repo
+
 from matador import git
+
+logger = getLogger(__name__)
 
 
 def deployment_repository(project_folder):
@@ -92,9 +96,9 @@ def environments():
         else:
             raise ValueError()
     except FileNotFoundError:
-        click.echo('Cannot find environments.yml file')
+        logger.error('Cannot find environments.yml file')
     except ValueError:
-        click.echo('environments.yml exists but is empty')
+        logger.error('environments.yml exists but is empty')
 
 
 def credentials():
@@ -109,6 +113,6 @@ def credentials():
         else:
             raise ValueError()
     except FileNotFoundError:
-        click.echo('Cannot find credentials.yml file')
+        logger.error('Cannot find credentials.yml file')
     except ValueError:
-        click.echo('credentials.yml exists but is empty')
+        logger.error('credentials.yml exists but is empty')

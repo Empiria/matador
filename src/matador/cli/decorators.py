@@ -1,16 +1,21 @@
 import functools
+import logging
 import os
-import click
 from pathlib import Path
+
 from dulwich.repo import Repo
+
 import matador.session as session
+
+logger = logging.getLogger(__name__)
 
 
 def windows_only(func):
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
         if os.name != 'nt':
-            click.echo(f'{func.__name__} can only be used on a Windows system')
+            logger.error(
+                f'{func.__name__} can only be used on a Windows system')
         else:
             return func(*args, **kwargs)
     return wrapped
@@ -36,4 +41,3 @@ def deploys_changes(func):
         Path.mkdir(packages_folder, parents=True, exist_ok=True)
         return func(*args, **kwargs)
     return wrapped
-

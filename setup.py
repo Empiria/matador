@@ -1,8 +1,10 @@
-from setuptools import setup, find_packages
-
 # Work around mbcs bug in distutils.
 # http://bugs.python.org/issue10945
 import codecs
+
+from setuptools import find_packages
+from setuptools import setup
+
 try:
     codecs.lookup('mbcs')
 except LookupError:

@@ -1,9 +1,12 @@
 import logging
+import re
+from time import gmtime
+from time import strftime
+
 from dulwich.client import LocalGitClient
 from dulwich.index import build_index_from_tree
-from dulwich.objects import Tag, format_timezone
-from time import strftime, gmtime
-import re
+from dulwich.objects import Tag
+from dulwich.objects import format_timezone
 
 logger = logging.getLogger(__name__)
 

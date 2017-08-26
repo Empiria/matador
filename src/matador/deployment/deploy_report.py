@@ -1,13 +1,17 @@
-import click
+import logging
 import os
-from dulwich.repo import Repo
+import shutil
 from pathlib import Path
+
+from dulwich.repo import Repo
+from openpyxl import load_workbook
+
+import matador.cli.utils as utils
+import matador.session as session
 from matador import git
 from matador import zippey
-import matador.session as session
-import matador.cli.utils as utils
-import shutil
-from openpyxl import load_workbook
+
+logger = logging.getLogger(__name__)
 
 
 def _create_deployment_xlsx_file(source_file, deployment_file, commit_ref):
@@ -80,7 +84,7 @@ def deploy_report_file(report_name, report_file_name, commit_ref):
     git.checkout(repo, commit_ref)
     create_deployment_file[source_file.suffix](
         source_file, deployment_file, commit_ref)
-    click.echo(f'Deploying {report_file_name} to {target_folder}')
+    logger.info(f'Deploying {report_file_name} to {target_folder}')
     shutil.copy(str(deployment_file), target_folder)
 
 
@@ -92,8 +96,8 @@ def remove_report_file(report_file_name):
         environment['abwServer'] + '/' +
         environment['customisedReports'])
     target_file = target_folder + '/' + report_file_name
-    click.echo(f'Removing {report_file_name} from {target_folder}')
+    logger.info(f'Removing {report_file_name} from {target_folder}')
     try:
         os.remove(target_file)
     except FileNotFoundError:
-        click.echo(f'{report_file_name} does not exist in {target_folder}')
+        logger.info(f'{report_file_name} does not exist in {target_folder}')
