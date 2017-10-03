@@ -1,6 +1,11 @@
 Changelog
 #########
 
+v4.0.4 (2017-10-03)
+-------------------
+
+* Bug Fix: Add missing dependeny to requirements.txt
+
 v4.0.3 (2017-10-03)
 -------------------
 
