@@ -1,6 +1,11 @@
 Changelog
 #########
 
+v4.0.3 (2017-10-03)
+-------------------
+
+* Bug Fix: Logging setup now creates deployment folder
+
 v4.0.2 (2017-10-03)
 -------------------
 
