@@ -4,10 +4,13 @@ from pathlib import Path
 
 from dulwich.repo import Repo
 
+from matador.cli.utils import deployment_repository
+
 
 def setup(handler, verbosity):
-    project = Path(Repo.discover().path).name
-    matador_log = Path(Path.home(), '.matador', project, 'matador.log')
+    project_folder = Path(Repo.discover().path)
+    deployment_repo = deployment_repository(project_folder)
+    matador_log = Path(deployment_repo.path, 'matador.log')
     log_config = {
         'version': 1,
         'handlers': {
