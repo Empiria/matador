@@ -1,8 +1,10 @@
 Changelog
 #########
 
-Unreleased
-----------
+v4.0.2 (2017-10-03)
+-------------------
+
+* Bug Fix: ``run_sql_script`` command now working
 
 v4.0.1 (2017-06-22)
 -------------------
