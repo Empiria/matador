@@ -1,6 +1,11 @@
 Changelog
 #########
 
+v4.1.0 (2017-10-11)
+-------------------
+
+* New Feature: Deployment command ``deploy_composite_report``
+
 v4.0.4 (2017-10-03)
 -------------------
 
