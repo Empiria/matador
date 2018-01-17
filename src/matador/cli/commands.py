@@ -123,10 +123,15 @@ def deploy_ticket(environment, ticket, commit, packaged):
     try:
         deployment_folder = utils.ticket_deployment_folder(
             environment, ticket, commit, packaged)
-        source_file = Path(deployment_folder, 'deploy.py')
-        SourceFileLoader('deploy', str(source_file)).load_module()
     except FileNotFoundError:
-        logger.error(f'Cannot find deployment folder/file for ticket {ticket}')
+        logger.error(f'Cannot find deployment folder for ticket {ticket}')
+
+    try:
+        source_file = Path(deployment_folder, 'deploy.py')
+    except FileNotFoundError:
+        logger.error(f'Cannot find deployment file for ticket {ticket}')
+
+    SourceFileLoader('deploy', str(source_file)).load_module()
 
 
 @matador.command(name='remove-ticket')
@@ -148,12 +153,14 @@ def remove_ticket(environment, ticket, commit, packaged):
     except FileNotFoundError:
         logger.error(f'Cannot find deployment folder/file for ticket {ticket}')
 
+
 @matador.command(name='deploy-package')
 @click.option(
     '--environment', '-e', prompt='Environment', help='Environment Name')
 @click.option('--package', '-p', prompt='Package', help='Package Name')
 @click.option('--commit', '-c', default=None, help='Commit Reference')
-def deploy_package(environment, package, commit):
+@click.pass_context
+def deploy_package(ctx, environment, package, commit):
     """Execute the deployment file for each ticket listed in the definition
     file for the given package."""
     logger.info(f'Deploying package {package} to {environment}')
@@ -167,15 +174,9 @@ def deploy_package(environment, package, commit):
     with tickets_file.open('r') as f:
         for ticket in yaml.load(f):
             logger.info('*' * 25)
-            logger.info(f'Deploying ticket {ticket} to {environment}')
-            try:
-                deployment_folder = utils.ticket_deployment_folder(
-                    environment, ticket, commit, True)
-                source_file = Path(deployment_folder, 'deploy.py')
-                SourceFileLoader('deploy', str(source_file)).load_module()
-            except FileNotFoundError:
-                logger.error(
-                    f'Cannot find deployment folder/file for ticket {ticket}')
+            ctx.invoke(
+                deploy_ticket, environment=environment, ticket=ticket,
+                commit=commit, packaged=True)
 
 
 @matador.command(name='remove-package')
@@ -183,7 +184,8 @@ def deploy_package(environment, package, commit):
     '--environment', '-e', prompt='Environment', help='Environment Name')
 @click.option('--package', '-p', prompt='Package', help='Package Name')
 @click.option('--commit', '-c', prompt='Commit Ref', help='Commit Reference')
-def remove_package(environment, package, commit):
+@click.pass_context
+def remove_package(ctx, environment, package, commit):
     """Execute the removal file for each ticket listed in the definition
     file for the given package."""
     logger.info(f'Removing package {package} from {environment}')
@@ -197,15 +199,9 @@ def remove_package(environment, package, commit):
     with tickets_file.open('r') as f:
         for ticket in yaml.load(f):
             logger.info('*' * 25)
-            logger.info(f'Removing ticket {ticket} from {environment}')
-            try:
-                deployment_folder = utils.ticket_deployment_folder(
-                    environment, ticket, commit, True)
-                source_file = Path(deployment_folder, 'deploy.py')
-                SourceFileLoader('remove', str(source_file)).load_module()
-            except FileNotFoundError:
-                logger.error(
-                    f'Cannot find deployment folder/file for ticket {ticket}')
+            ctx.invoke(
+                remove_ticket, environment=environment, ticket=ticket,
+                commit=commit, packaged=True)
 
 
 @matador.command(name='run-sql-script')
