@@ -54,7 +54,9 @@ def deploy_sql_script(path, commit_ref=None):
     kwargs['directory'] = str(script.parent)
     kwargs['file'] = str(script.name)
 
-    run_sql_script(**kwargs)
+    returncode, output = run_sql_script(**kwargs)
+    if returncode:
+        logger.error(output.decode("utf-8") )
 
 
 def deploy_oracle_package(package_name, commit_ref=None):

@@ -73,9 +73,9 @@ def command(**kwargs):
         ('mssql', 'posix'):
             'bsqldb -S ${server} -D ${db_name} -U ${user} -P ${password}',
         ('mssql', 'nt', 'windows_authentication'):
-            'sqlcmd -S ${server} -d ${db_name} -E',
+            'sqlcmd -S ${server} -d ${db_name} -E -b',
         ('mssql', 'nt', 'mssql_authentication'):
-            'sqlcmd -S ${server} -d ${db_name} -U ${user} -P ${password}'
+            'sqlcmd -S ${server} -d ${db_name} -U ${user} -P ${password} -b'
     }
 
     return Template(commands[condition]).substitute(params)
@@ -120,11 +120,11 @@ def run_sql_script(**kwargs):
 
     os.chdir(kwargs['directory'])
 
-    process = subprocess.Popen(
+    process = subprocess.run(
         command(**kwargs).split(),
-        stdin=subprocess.PIPE)
-    process.stdin.write(sql_script(**kwargs))
-    process.stdin.close()
-    process.wait()
+        input=sql_script(**kwargs),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
 
     os.chdir(cwd)
+    return(process.returncode, process.stdout)
